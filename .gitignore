@@ -17,3 +17,6 @@ velocity.log
 
 # OS X
 .DS_Store
+
+# Ansible
+hosts

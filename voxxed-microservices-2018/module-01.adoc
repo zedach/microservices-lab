@@ -26,13 +26,20 @@ Topic management works in a similar fashion: for creating and modifying topics, 
 
 You will do all this as part of the first lab.
 
-=== Installing Strimzi
+=== Connecting to Your VM
 
-First, connect via SSH to the workstation.
-The keys for connecting remotely to the workstation are already provisioned on your machine.
+First, connect via SSH to the Vagrant VM on your machine or your remote cloud environment.
+For a local Vagrant box run:
 
 [source, sh]
 $ vagrant ssh
+
+Otherwise, run:
+
+[source, sh]
+$ ssh <YOUR IP>
+
+=== Installing Strimzi
 
 Start up OpenShift:
 

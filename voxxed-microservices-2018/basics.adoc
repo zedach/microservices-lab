@@ -1,24 +1,41 @@
 == Environment
 
-The lab environment provides a virtualized setup for developing and running Kafka applications on OpenShift.
-It consists of:
+This lab requires a prepared environment for running OpenShift.
 
-* an OpenShift cluster with one master node and three worker nodes;
-* a workstation;
+There are two two ways of preparing this environment:
 
-During the lab you will interact with the OpenShift cluster via CLI from the workstation and with the OpenShift web console from the browser available on your station.
-Make note of the URLs that you will use during the lab.
+* On your local machine using Vagrant
+* On a cloud machine that you can access using SSH
 
-|===
-| Machine | URL | Access
-| Workstation | `workstation-<GUID>.rhpds.opentlc.com` | SSH (port 22)
-| Master (OpenShift console) | `openshift-<GUID>.rhpds.opentlc.com` | HTTPS (port 8443)
-|===
+In both cases the VM running OpenShift should have 6 GB of RAM or more.
+An Ansible playbook is provided for setting up the environment.
+Please perform these steps before coming to the workshop.
 
-[NOTE]
-.Remember your GUID
-At the start of the lab you have been provided with a GUID, which uniquely identifies your lab environment.
-In the following instructions, replace the `<GUID>` placeholder with your GUID.
-For example, if your GUID is `a2b3`, the URL `workstation-<GUID>.example.com` becomes `workstation-a2b3.example.com`.
+=== Requirements
+
+* Ansible 2.4 or newer installed
+* Vagrant installed or access to a VM in the cloud that you can SSH into
+
+=== Using Vagrant
+
+tbd.
+
+=== Using a Cloud Machine
+
+Clone the workshop repo:
+
+[source, sh]
+git clone https://github.com/debezium/microservices-lab.git
+cd microservices-lab/vm-setup
+
+Create a file _hosts_ with the following contents:
+
+[source]
+<YOUR IP> ansible_ssh_private_key_file=~/.ssh/your_ssh_key ansible_python_interpreter=/usr/bin/python3
+
+Provision the environment using Ansible:
+
+[source, sh]
+ansible-playbook -i hosts site.yml
 
 Now, let's start the lab.

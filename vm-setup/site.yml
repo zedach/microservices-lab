@@ -1,0 +1,87 @@
+---
+- hosts: all
+  remote_user: root
+  become: yes
+  become_user: root
+  vars:
+    tools_dir: /home/build/tools
+    downloads_dir: /home/build/downloads
+    #openshift_version: 3.10.0
+    #openshift_hash: dd10d17
+    openshift_version: 3.9.0
+    openshift_hash: 191fece
+
+  tasks:
+  - name: upgrade all packages
+    dnf: name="*" state=latest
+  - name: Have common tools
+    dnf: name={{item}} state=latest
+    with_items:
+       - git
+       - wget
+       - htop
+       - acl
+       - dnf-plugins-core
+       - bash-completion
+  - name: have build user
+    user:
+      name: build
+      shell: /bin/bash
+
+  - name: Have docker repo
+    shell:  'dnf config-manager \
+      --add-repo \
+      https://download.docker.com/linux/fedora/docker-ce.repo'
+  - name: Have dnf cache updated
+    shell: 'dnf makecache'
+  - name: Have docker-ce
+    dnf: name=docker-ce
+  - name: add docker group
+    group: name=docker state=present
+  - name: Have daemon.json
+    copy:
+      src: docker_daemon.json
+      dest: /etc/docker/daemon.json
+
+  - name: Ensure Docker is started
+    systemd:
+      state: started
+      name: docker
+
+  - name: add wheel group
+    group:
+      name: wheel
+      state: present
+  - name: Allow wheel group to have passwordless sudo
+    lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%wheel'
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+      validate: visudo -cf %s
+
+  - name: add user
+    user: name=build groups=docker,wheel state=present append=yes
+
+  - name: set-up build environment
+    block:
+      - name: Have {{ tools_dir }}
+        file: path={{ tools_dir }} state=directory
+      - name: Have {{ downloads_dir }}
+        file: path={{ downloads_dir }} state=directory
+
+      - name: Have OpenShift {{ openshift_version }}
+        unarchive:
+          src: https://github.com/openshift/origin/releases/download/v{{ openshift_version }}/openshift-origin-client-tools-v{{ openshift_version }}-{{ openshift_hash }}-linux-64bit.tar.gz
+          dest: "{{ tools_dir }}"
+          remote_src: True
+          creates: "{{ tools_dir }}/openshift-origin-client-tools-v{{ openshift_version }}-{{ openshift_hash }}-linux-64bit"
+
+      - name: Have .bashrc
+        copy:
+          src: user_bashrc
+          dest: /home/build/.bashrc
+          mode: 0644
+
+    become: true
+    become_user: root
