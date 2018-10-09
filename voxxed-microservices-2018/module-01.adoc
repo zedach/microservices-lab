@@ -39,6 +39,11 @@ Otherwise, run:
 [source, sh]
 $ ssh <YOUR IP>
 
+If you've set up the environment using the provided Ansible scripts, switch to the `build` user:
+
+[source, sh]
+sudo su build
+
 === Installing Strimzi
 
 Start up OpenShift:

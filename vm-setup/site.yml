@@ -23,6 +23,7 @@
        - acl
        - dnf-plugins-core
        - bash-completion
+       - libselinux-python
   - name: have build user
     user:
       name: build
@@ -38,6 +39,8 @@
     dnf: name=docker-ce
   - name: add docker group
     group: name=docker state=present
+  - name: Have /etc/docker
+    file: path=/etc/docker state=directory
   - name: Have daemon.json
     copy:
       src: docker_daemon.json

@@ -20,3 +20,6 @@ velocity.log
 
 # Ansible
 hosts
+
+# Vagrant
+.vagrant
