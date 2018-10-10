@@ -42,7 +42,7 @@ $ ssh <YOUR SERVER IP>
 If you've set up the environment using the provided Ansible scripts, switch to the `build` user:
 
 [source, sh]
-sudo su build
+$ sudo su - build
 
 === Installing Strimzi
 
@@ -140,16 +140,20 @@ template.template.openshift.io "strimzi-ephemeral" created
 template.template.openshift.io "strimzi-persistent" created
 
 Now you can deploy a Kafka cluster.
-For this lab, we will use a template, but you could create a resource file from scratch as well.
+For this lab, we will use a template (so to bootstrap only a single ZooKeeper node),
+but you could create a resource file from scratch as well or use one from _examples/kafka_.
+
+TODO: decide on ZK nodes
 
 [source, sh]
-$ oc apply -f examples/kafka/kafka-ephemeral.yaml
-kafka.kafka.strimzi.io "my-cluster" created
+# $ oc apply -f examples/kafka/kafka-ephemeral.yaml
+$ oc process strimzi-ephemeral -p ZOOKEEPER_NODE_COUNT=1 | oc apply -f -
+kafka "my-cluster" created
 
 Let's take a look at the resource we've created:
 
 [source, sh]
-oc describe kafka my-cluster
+$ oc describe kafka my-cluster
 Name:         my-cluster
 Namespace:    voxxed
 Labels:       <none>
@@ -211,9 +215,9 @@ Note how for instance the number of Kafka and ZooKeeper nodes is controlled usin
 Visualize the running pods:
 
 [source,sh]
-$ oc get pods
+$ oc get pods -w
 
-You might need to run the command a few times, with different results, as the pods are spinning up, but you should see the results stabilizing as:
+Wait until all pods have spun up and are in `Running` status:
 
 [source,sh]
 $ oc get pods
@@ -230,7 +234,7 @@ strimzi-cluster-operator-7d8898b9b9-jfwv5     1/1       Running   0          14m
 In addition to the `cluster operator` created previously, notice a few more deployments:
 
 * the `entity operator` is now deployed as well - you can deploy it independently, but the Strimzi template deploys it out of the box; it is used to manage topics and/or users of Kafka
-* three Zookeeper node
+* three Zookeeper nodes
 * three Kafka brokers
 
 Also, notice that the Zookeeper ensemble and the Kafka cluster are deployed as stateful sets.
@@ -379,7 +383,7 @@ default.replication.factor=2
 
 ==== Handling topics
 
-It's possible to create a topic by creating a `kafkatopic` resource from scratch but for this lab we are going to use the related template.
+It's possible to create a topic by creating a `kafkatopic` resource from scratch, but for this lab we are going to use the related example resource file:
 
 [source,sh]
 $ oc apply -f examples/topic/kafka-topic.yaml
