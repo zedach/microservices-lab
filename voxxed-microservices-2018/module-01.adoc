@@ -37,7 +37,7 @@ $ vagrant ssh
 Otherwise, run:
 
 [source, sh]
-$ ssh <YOUR IP>
+$ ssh <YOUR SERVER IP>
 
 If you've set up the environment using the provided Ansible scripts, switch to the `build` user:
 
@@ -46,10 +46,10 @@ sudo su build
 
 === Installing Strimzi
 
-Start up OpenShift:
+Start up OpenShift (omit the public host name when using Vagrant):
 
 [source, sh]
-$ oc cluster up --public-hostname=<YOUR IP>
+$ oc cluster up --public-hostname=<YOUR SERVER IP>
 
 Log into OpenShift:
 
