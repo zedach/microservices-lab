@@ -69,7 +69,7 @@
 
     <dependency>
       <groupId>io.thorntail</groupId>
-      <artifactId>jaxrs</artifactId>
+      <artifactId>jaxrs-jsonp</artifactId>
     </dependency>
 
     <dependency>

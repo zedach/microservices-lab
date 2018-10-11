@@ -2,6 +2,8 @@ package io.debezium.examples.ticketmsa.order.model;
 
 import java.math.BigDecimal;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -78,6 +80,16 @@ public class Order {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public JsonObject toJson() {
+        return Json.createObjectBuilder()
+                .add("id", id)
+                .add("firstName", firstName)
+                .add("lastName", lastName)
+                .add("email", email)
+                .add("price", price)
+                .build();
     }
 
     @Override

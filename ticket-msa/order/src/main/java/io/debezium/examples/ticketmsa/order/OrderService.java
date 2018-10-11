@@ -3,6 +3,7 @@ package io.debezium.examples.ticketmsa.order;
 import java.math.BigDecimal;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -27,7 +28,7 @@ public class OrderService {
     private EntityManager entityManager;
 
     @Producer
-    private SimpleKafkaProducer<Integer, String> producer;
+    private SimpleKafkaProducer<Integer, JsonObject> kafka;
 
     @GET
     @Transactional
@@ -35,7 +36,7 @@ public class OrderService {
     public Order addOrder() {
         Order order = new Order("John", "Doe", "john.doe@example.com", new BigDecimal(1000));
         order = entityManager.merge(order);
-        producer.send(TOPIC_ORDER, order.getId(), order.toString());
+        kafka.send(TOPIC_ORDER, order.getId(), order.toJson());
         return order;
     }
 }
