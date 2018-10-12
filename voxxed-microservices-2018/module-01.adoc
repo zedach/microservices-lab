@@ -271,9 +271,14 @@ $ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/m
 Finally it is necessary to enable metrics collection from Kafka brokers by definining a set of data available from JMX.
 This is configured in the Kafka resource.
 
- * Open the kafka resource using command `oc edit kafka my-cluster`.
- * Paste the content of the file `https://raw.githubusercontent.com/debezium/microservices-lab/master/vm-setup/kafka-metrics.yaml` right under the `kafka:` line that represents the start of the broker configuration.
-Make sure that the resulting text is still valid YAML file.
+
+```console
+# Download Kafka metrics definition file
+$ wget https://raw.githubusercontent.com/debezium/microservices-lab/master/vm-setup/kafka-metrics.yaml`
+
+# Apply the metrics to the kafka resource
+$ oc get kafka my-cluster -o yaml | sed '/kafka:/ r kafka-metrics.yaml' - | oc apply -f -
+```
 
 After that the nodes in the cluster are automatically restarted.
 
