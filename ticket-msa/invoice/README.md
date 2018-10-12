@@ -1,7 +1,8 @@
 # Invoice Microservice
-Pre-requisities
-* Kafka broker service
 
+## Prerequisites
+
+* Kafka broker service running
 
 ## Deploy service to OpenShift from source
 

@@ -1,8 +1,9 @@
 # Order Microservice
-Pre-requisities
+
+## Prerequisites
+
 * MySQL service
 * Kafka broker service
-
 
 ## Deploy service to OpenShift from source
 
