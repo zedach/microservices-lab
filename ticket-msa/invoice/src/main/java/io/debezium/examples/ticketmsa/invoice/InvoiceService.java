@@ -11,11 +11,9 @@ import org.slf4j.LoggerFactory;
 @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
 public class InvoiceService {
 
-    private static final String TOPIC_ORDER = "orders";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(InvoiceService.class);
 
-    @Consumer(topics = TOPIC_ORDER, groupId = "InvoiceService")
+    @Consumer(topics = "#{ORDER_TOPIC_NAME}", groupId = "InvoiceService")
     public void orderArrived(final String order) {
         LOGGER.info("Order event '{}' arrived", order);
     }

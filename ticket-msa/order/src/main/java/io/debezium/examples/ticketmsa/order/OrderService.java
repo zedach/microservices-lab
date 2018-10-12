@@ -3,6 +3,7 @@ package io.debezium.examples.ticketmsa.order;
 import java.math.BigDecimal;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -14,6 +15,7 @@ import javax.ws.rs.Produces;
 import org.aerogear.kafka.SimpleKafkaProducer;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 import org.aerogear.kafka.cdi.annotation.Producer;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.debezium.examples.ticketmsa.order.model.Order;
 
@@ -22,7 +24,9 @@ import io.debezium.examples.ticketmsa.order.model.Order;
 @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
 public class OrderService {
 
-    private static final String TOPIC_ORDER = "orders";
+    @Inject
+    @ConfigProperty(name="order.topic.name", defaultValue="orders")
+    private String topicName;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -36,7 +40,7 @@ public class OrderService {
     public Order addOrder() {
         Order order = new Order("John", "Doe", "john.doe@example.com", new BigDecimal(1000));
         order = entityManager.merge(order);
-        kafka.send(TOPIC_ORDER, order.getId(), order.toJson());
+        kafka.send(topicName, order.getId(), order.toJson());
         return order;
     }
 }
