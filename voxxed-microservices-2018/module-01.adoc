@@ -305,7 +305,7 @@ After "Add" is clicked, Grafana will test the connection to the data source.
 image::grafana_prometheus_data_source.png[grafana prometheus data source]
 
 From the top left menu, click on "Dashboards" and then "Import" to open the "Import Dashboard" window.
-Open a browser tab and navigate to `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.7.0/metrics/examples/grafana/kafka-dashboard.json`.
+Open a browser tab and navigate to `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/grafana/strimzi-kafka.json`.
 You should see JSON content as response.
 Copy and paste it in the appropriate field in the form.
 
@@ -316,6 +316,8 @@ When the Kafka cluster is used (creating topics and exchanging messages) the oth
 
 image::grafana_kafka_dashboard.png[grafana kafka dashboard]
 
+If you are interested you can create a dashboard also for Kafka Connect instance that will be used later in this exercise.
+The dashboard definition can be found at `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/grafana/strimzi-kafka-connect.json`.
 === Handling cluster and topics
 
 Before starting to develop data streaming applications and running them, let's see how it's possible to handle the Kafka cluster itself and the topics.
