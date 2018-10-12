@@ -43,6 +43,7 @@
             <KAFKA_SERVICE_HOST>localhost</KAFKA_SERVICE_HOST>
             <KAFKA_SERVICE_PORT>9092</KAFKA_SERVICE_PORT>
             <TT_PORT_OFFSET>100</TT_PORT_OFFSET>
+            <ORDER_TOPIC_NAME>myorders</ORDER_TOPIC_NAME>
           </environment>
         </configuration>
         <executions>
