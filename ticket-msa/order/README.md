@@ -7,7 +7,7 @@ Pre-requisities
 ## Deploy service to OpenShift from source
 
 ```
-$ oc new-app --name=order-msa fabric8/s2i-java:latest~https://github.com/jpechane/strimzi-lab#ticket-skeleton \
+$ oc new-app --name=order-msa fabric8/s2i-java:latest~https://github.com/debezium/microservices-lab \
     --context-dir=ticket-msa/order \
     -e MYSQL_DATABASE=inventory \
     -e AB_PROMETHEUS_OFF=true \

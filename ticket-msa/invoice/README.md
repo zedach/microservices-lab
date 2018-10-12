@@ -6,7 +6,7 @@ Pre-requisities
 ## Deploy service to OpenShift from source
 
 ```
-$ oc new-app --name=invoice-msa fabric8/s2i-java:latest~https://github.com/jpechane/strimzi-lab#ticket-skeleton \
+$ oc new-app --name=invoice-msa fabric8/s2i-java:latest~https://github.com/debezium/microservices-lab \
     --context-dir=ticket-msa/invoice \
     -e AB_PROMETHEUS_OFF=true \
     -e KAFKA_SERVICE_HOST=my-cluster-kafka-bootstrap \
