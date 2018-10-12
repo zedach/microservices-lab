@@ -238,6 +238,16 @@ In addition to the `cluster operator` created previously, notice a few more depl
 
 Also, notice that the Zookeeper ensemble and the Kafka cluster are deployed as stateful sets.
 
+=== Resource limits
+The deployed Kafka broker instances and the ZooKeeper are by default configured to use all available memory provided by the environment.
+This is usually undesirable so we will set OpenShift limits to them so each of the pods will receive only allocated portion of memory which is 1 GB in case of each broker instance and 512 MB in case of ZooKeeper.
+The CPU pressure is not so important in our case so we will keep it unlimited.
+
+To limit the RAM we need to configure the kafka resource we have seen above using the patch command
+
+[source,sh]
+$ oc patch kafka my-cluster --type merge -p '{ "spec" : { "zookeeper" : { "resources" : { "limits" : { "memory" : "512Mi" }, "requests" : { "memory" : "512Mi" } } },  "kafka" : { "resources" : { "limits" : { "memory" : "1Gi" }, "requests" : { "memory" : "1Gi" } } } } }'
+
 === Monitoring with Prometheus and Grafana
 
 By default, Strimzi provides the Kafka brokers and the Zookeeper nodes with a Prometheus JMX exporter agent which is running in order to export metrics.
