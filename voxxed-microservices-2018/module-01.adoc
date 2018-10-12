@@ -263,10 +263,19 @@ $ export NAMESPACE=voxxed
 $ oc create sa prometheus-server
 $ oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:${NAMESPACE}:prometheus-server
 
-Finally, create the Prometheus service by running:
+Create the Prometheus service by running:
 
 [source,sh]
 $ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/prometheus/kubernetes.yaml
+
+Finally it is necessary to enable metrics collection from Kafka brokers by definining a set of data available from JMX.
+This is configured in the Kafka resource.
+
+ * Open the kafka resource using command `oc edit kafka my-cluster`.
+ * Paste the content of the file `https://raw.githubusercontent.com/debezium/microservices-lab/master/vm-setup/kafka-metrics.yaml` right under the `kafka:` line that represents the start of the broker configuration.
+Make sure that the resulting text is still valid YAML file.
+
+After that the nodes in the cluster are automatically restarted.
 
 ==== Grafana
 
