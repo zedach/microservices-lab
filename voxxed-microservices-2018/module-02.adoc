@@ -1,4 +1,10 @@
-== Running an IoT application with Kafka Streams
+== Using the Kafka API to exchange data between two microservices
+
+TODO: Pull in required steps here.
+
+For now, see ticket-msa/order/README.md and ticket-msa/invoice/README.md.
+
+TODO: Remove steps below.
 
 The IoT demo is made by different components with the following architecture :
 
