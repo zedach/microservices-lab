@@ -268,7 +268,7 @@ Create the Prometheus service by running:
 [source,sh]
 $ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/prometheus/kubernetes.yaml
 
-Finally it is necessary to enable metrics collection from Kafka brokers by definining a set of data available from JMX.
+Finally it is necessary to enable metrics collection from Kafka brokers by defining a set of data available from JMX.
 This is configured in the Kafka resource.
 
 
