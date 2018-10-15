@@ -46,10 +46,10 @@ $ sudo su - build
 
 === Installing Strimzi
 
-Start up OpenShift (omit the `--public-hostname` when using Vagrant):
+Start up OpenShift (use IP address `192.168.33.10` when using Vagrant):
 
 [source, sh]
-$ oc cluster up --use-existing-config --public-hostname=<YOUR SERVER IP>
+$ oc cluster up --routing-suffix=<YOUR SERVER IP>.nip.io
 
 Log into OpenShift:
 
