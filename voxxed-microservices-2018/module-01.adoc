@@ -59,18 +59,18 @@ $ oc login -u developer
 Download Strimzi and extract it;
 
 [source, sh]
-$ wget https://github.com/strimzi/strimzi/releases/download/0.7.0/strimzi-0.7.0.tar.gz
-$ tar xzvf strimzi-0.7.0.tar.gz
+$ wget https://github.com/strimzi/strimzi/releases/download/0.8.0/strimzi-0.8.0.tar.gz
+$ tar xzvf strimzi-0.8.0.tar.gz
 
-Enter the `strimzi-0.7.0` directory.
+Enter the `strimzi-0.8.0` directory.
 
 [source, sh]
-$ cd strimzi-0.7.0
+$ cd strimzi-0.8.0
 
 Adjust the namespace in the installation files to `voxxed`:
 
 [source, sh]
-$ sed -i 's/namespace: .*/namespace: voxxed/' examples/install/cluster-operator/*RoleBinding*.yaml
+$ sed -i 's/namespace: .*/namespace: voxxed/' install/cluster-operator/*RoleBinding*.yaml
 
 Next, create a new project for the lab:
 
@@ -92,7 +92,7 @@ $ oc login -u system:admin
 Install the cluster operator:
 
 [source, sh]
-$ oc apply -f examples/install/cluster-operator -n voxxed
+$ oc apply -f install/cluster-operator -n voxxed
 
 You should see a few resources being created:
 
@@ -266,7 +266,7 @@ $ oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:${
 Create the Prometheus service by running:
 
 [source,sh]
-$ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/prometheus/kubernetes.yaml
+$ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.8.0/metrics/examples/prometheus/kubernetes.yaml
 
 Finally it is necessary to enable metrics collection from Kafka brokers by defining a set of data available from JMX.
 This is configured in the Kafka resource.
@@ -274,7 +274,7 @@ This is configured in the Kafka resource.
 
 ```console
 # Download Kafka metrics definition file
-$ wget https://raw.githubusercontent.com/debezium/microservices-lab/master/vm-setup/kafka-metrics.yaml`
+$ wget https://raw.githubusercontent.com/debezium/microservices-lab/master/vm-setup/kafka-metrics.yaml
 
 # Apply the metrics to the kafka resource
 $ oc get kafka my-cluster -o yaml | sed '/kafka:/ r kafka-metrics.yaml' - | oc apply -f -
@@ -289,7 +289,7 @@ The Grafana server is really useful to get a visualisation of the Prometheus met
 To deploy Grafana on OpenShift, the following commands should be executed:
 
 [source,sh]
-$ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/grafana/kubernetes.yaml
+$ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.8.0/metrics/examples/grafana/kubernetes.yaml
 
 You can access the Grafana UI after running:
 
@@ -319,7 +319,7 @@ After "Add" is clicked, Grafana will test the connection to the data source.
 image::grafana_prometheus_data_source.png[grafana prometheus data source]
 
 From the top left menu, click on "Dashboards" and then "Import" to open the "Import Dashboard" window.
-Open a browser tab and navigate to `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/grafana/strimzi-kafka.json`.
+Open a browser tab and navigate to `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.8.0/metrics/examples/grafana/strimzi-kafka.json`.
 You should see JSON content as response.
 Copy and paste it in the appropriate field in the form.
 
@@ -331,7 +331,7 @@ When the Kafka cluster is used (creating topics and exchanging messages) the oth
 image::grafana_kafka_dashboard.png[grafana kafka dashboard]
 
 If you are interested you can create a dashboard also for Kafka Connect instance that will be used later in this exercise.
-The dashboard definition can be found at `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/metrics/examples/grafana/strimzi-kafka-connect.json`.
+The dashboard definition can be found at `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.8.0/metrics/examples/grafana/strimzi-kafka-connect.json`.
 === Handling cluster and topics
 
 Before starting to develop data streaming applications and running them, let's see how it's possible to handle the Kafka cluster itself and the topics.
