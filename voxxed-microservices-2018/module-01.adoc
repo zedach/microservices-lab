@@ -268,6 +268,14 @@ Create the Prometheus service by running:
 [source,sh]
 $ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.8.0/metrics/examples/prometheus/kubernetes.yaml
 
+Deploy Node Exporter to collect system-level metrics:
+```console
+$ oc adm policy add-cluster-role-to-user prometheus-server system:serviceaccount:${NAMESPACE}:prometheus-server
+$ oc adm policy add-scc-to-user -z prometheus-node-exporter hostnetwork
+$ oc adm policy add-scc-to-user -z prometheus-node-exporter hostaccess
+$ oc apply -f https://raw.githubusercontent.com/openshift/origin/v3.11.0/examples/prometheus/node-exporter.yaml
+```
+
 Finally it is necessary to enable metrics collection from Kafka brokers by defining a set of data available from JMX.
 This is configured in the Kafka resource.
 
