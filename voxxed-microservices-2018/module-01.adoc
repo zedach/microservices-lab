@@ -493,8 +493,9 @@ Let's build some applications!
 
 ==== Environment cleanup
 
+
 After you complete all modules in this exercise then you can clean up the environment by issuing commands
-```console
+
+[source,sh]
 $ oc cluster down
-$ rm $HOME/openshift.local.clusterup
-```
+$ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount && sudo rm -rf $HOME/openshift.local.clusterup
