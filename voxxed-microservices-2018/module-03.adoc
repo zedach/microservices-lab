@@ -735,6 +735,14 @@ Open that URL in a browser, it should be in the form http://websocketsinkapp-vox
 
 Modify some entries in the CRUD application and observe how the change events are propagated to the other browser window via WebSockets in near-realtime.
 
+==== Environment cleanup
+
+After you complete all modules in this exercise then you can clean up the environment by issuing commands
+```console
+$ oc cluster down
+$ rm $HOME/openshift.local.clusterup
+```
+
 === Summary
 
 In this part of the lab you've learned about the concept of change data capture and how to implement it using Debezium and Kafka (Connect).

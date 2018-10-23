@@ -490,3 +490,11 @@ This time the output should be empty.
 
 Now your Kafka cluster is running and ready to go.
 Let's build some applications!
+
+==== Environment cleanup
+
+After you complete all modules in this exercise then you can clean up the environment by issuing commands
+```console
+$ oc cluster down
+$ rm $HOME/openshift.local.clusterup
+```
