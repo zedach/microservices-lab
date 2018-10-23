@@ -51,7 +51,9 @@ Start up OpenShift (use IP address `192.168.33.10` when using Vagrant):
 [source, sh]
 $ oc cluster up --routing-suffix=<YOUR SERVER IP>.nip.io
 
-Log into OpenShift:
+This make take a few minutes.
+
+Once OpenShift has started, log in:
 
 [source, sh]
 $ oc login -u developer
@@ -128,6 +130,12 @@ The command output should be similar to:
 [source,sh]
 NAME                                          READY     STATUS    RESTARTS   AGE
 strimzi-cluster-operator-2044197322-lzrvr   1/1       Running   0          3m
+
+You also can log into the OpenShift web console to do the same.
+Go to <YOUR SERVER IP>:8443 (accept all warnings about certificate issues),
+log in using "developer" and any password, and choose the "voxxed" project.
+You should see a single deployed application, "strimzi-cluster-operator".
+All the applications you'll deploy in the following will show up automatically, too.
 
 Next, install the Strimzi templates.
 The Cluster Operator related templates contain predefined resources for easily deploying clusters (for Kafka Connect as well).
@@ -278,7 +286,6 @@ $ oc apply -f https://raw.githubusercontent.com/openshift/origin/v3.11.0/example
 
 Finally it is necessary to enable metrics collection from Kafka brokers by defining a set of data available from JMX.
 This is configured in the Kafka resource.
-
 
 [source,sh]
 ----
