@@ -44,7 +44,7 @@ Switch to the `build` user:
 [source, sh]
 $ sudo su - build
 
-=== Installing Strimzi
+=== Starting OpenShift
 
 Start up OpenShift (use IP address `192.168.33.10` when using Vagrant):
 
@@ -57,6 +57,16 @@ Once OpenShift has started, log in:
 
 [source, sh]
 $ oc login -u developer
+
+==== Environment cleanup
+
+After you have completed all modules in this workshop then you can clean up the environment by issuing these commands:
+
+[source,sh]
+$ oc cluster down
+$ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount && sudo rm -rf $HOME/openshift.local.clusterup
+
+=== Installing Strimzi
 
 Download Strimzi and extract it;
 
@@ -499,11 +509,3 @@ This time the output should be empty.
 
 Now your Kafka cluster is running and ready to go.
 Let's build some applications!
-
-==== Environment cleanup
-
-After you complete all modules in this exercise then you can clean up the environment by issuing commands
-
-[source,sh]
-$ oc cluster down
-$ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount && sudo rm -rf $HOME/openshift.local.clusterup

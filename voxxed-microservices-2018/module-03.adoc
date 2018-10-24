@@ -778,6 +778,15 @@ no matter in which table they are stored within the source database.
 
 ==== Consuming Data Change Events With Thorntail
 
+----
+TODO: We could replace this part and show how to throw KStreams into the mix and run some streaming queries on the CDC data.
+Essentially, this would be taken from the Kafka Summit demo:
+
+    https://github.com/debezium/debezium-examples/tree/master/kstreams-live-update
+
+We'd only adjust it to the domain model of our example here of course.
+----
+
 Finally, let's explore how to consume the Debezium events in a custom application and forward them to a web UI using WebSockets.
 
 The example application for that is based on https://thorntail.io/[Thorntail],
