@@ -39,7 +39,7 @@ Otherwise, run:
 [source, sh]
 $ ssh <YOUR SERVER IP>
 
-If you've set up the environment using the provided Ansible scripts, switch to the `build` user:
+Switch to the `build` user:
 
 [source, sh]
 $ sudo su - build
@@ -269,24 +269,25 @@ Create the Prometheus service by running:
 $ oc apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.8.0/metrics/examples/prometheus/kubernetes.yaml
 
 Deploy Node Exporter to collect system-level metrics:
-```console
+
+[source,sh]
 $ oc adm policy add-cluster-role-to-user prometheus-server system:serviceaccount:${NAMESPACE}:prometheus-server
 $ oc adm policy add-scc-to-user -z prometheus-node-exporter hostnetwork
 $ oc adm policy add-scc-to-user -z prometheus-node-exporter hostaccess
 $ oc apply -f https://raw.githubusercontent.com/openshift/origin/v3.11.0/examples/prometheus/node-exporter.yaml
-```
 
 Finally it is necessary to enable metrics collection from Kafka brokers by defining a set of data available from JMX.
 This is configured in the Kafka resource.
 
 
-```console
+[source,sh]
+----
 # Download Kafka metrics definition file
 $ wget https://raw.githubusercontent.com/debezium/microservices-lab/master/vm-setup/kafka-metrics.yaml
 
 # Apply the metrics to the kafka resource
 $ oc get kafka my-cluster -o yaml | sed '/kafka:/ r kafka-metrics.yaml' - | oc apply -f -
-```
+----
 
 After that the nodes in the cluster are automatically restarted.
 
@@ -340,6 +341,7 @@ image::grafana_kafka_dashboard.png[grafana kafka dashboard]
 
 If you are interested you can create a dashboard also for Kafka Connect instance that will be used later in this exercise.
 The dashboard definition can be found at `https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/0.8.0/metrics/examples/grafana/strimzi-kafka-connect.json`.
+
 === Handling cluster and topics
 
 Before starting to develop data streaming applications and running them, let's see how it's possible to handle the Kafka cluster itself and the topics.
@@ -492,7 +494,6 @@ Now your Kafka cluster is running and ready to go.
 Let's build some applications!
 
 ==== Environment cleanup
-
 
 After you complete all modules in this exercise then you can clean up the environment by issuing commands
 
