@@ -88,6 +88,9 @@
       - name: Pull Docker images
         shell: "docker pull debezium/example-mysql:{{ debezium_tag }} && docker pull fabric8/s2i-java && docker pull openshift/origin-node:{{ openshift_tag }} && docker pull openshift/origin-control-plane:{{ openshift_tag }} && docker pull openshift/origin-docker-builder:{{ openshift_tag }} && docker pull openshift/origin-haproxy-router:{{ openshift_tag }} && docker pull openshift/origin-deployer:{{ openshift_tag }} && docker pull openshift/origin-hypershift:{{ openshift_tag }} && docker pull openshift/origin-hyperkube:{{ openshift_tag }} && docker pull openshift/origin-cli:{{ openshift_tag }} && docker pull openshift/origin-pod:{{ openshift_tag }} && docker pull openshift/origin-web-console:{{ openshift_tag }} && docker pull openshift/origin-docker-registry:{{ openshift_tag }} && docker pull openshift/origin-service-serving-cert-signer:{{ openshift_tag }} && docker pull strimzi/user-operator:{{ strimzi_tag }} && docker pull strimzi/topic-operator:{{ strimzi_tag }} && docker pull strimzi/cluster-operator:{{ strimzi_tag }} && docker pull strimzi/kafka-stunnel:{{ strimzi_tag }} && docker pull strimzi/entity-operator-stunnel:{{ strimzi_tag }} && docker pull strimzi/zookeeper-stunnel:{{ strimzi_tag }} && docker pull strimzi/zookeeper:{{ strimzi_tag }} && docker pull strimzi/kafka:{{ strimzi_tag }} && docker pull strimzi/kafka-connect:{{ strimzi_tag }} && docker pull strimzi/kafka-connect-s2i:{{ strimzi_tag }} && docker pull strimzilab/grafana-openshift:latest && docker pull prom/prometheus:{{ prometheus_tag }}"
 
+      - name: Configure mmap for Elasticsearch
+        shell: "sysctl -w vm.max_map_count=262144"
+
       - name: Have .bashrc
         copy:
           src: user_bashrc
