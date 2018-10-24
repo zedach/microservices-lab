@@ -6,7 +6,7 @@ This is a source repository for [Vagrant image](https://app.vagrantup.com/debezi
 There are two ways how to use the image
 * (recommended) Use provided `Vagrant` file. In this case just download the `Vagrantfile` into an arbitrary directory and issue `vagrant up` command.
 After a while the new virtual machine will be spawned and you could log to it via `vagrant ssh`.
-* (advanced) Create the envrionment form scratch using `vagrant init debezium/microservices-lab` command.
+* (advanced) Create the environment from scratch using `vagrant init debezium/microservices-lab` command.
 In this case the user is responsible for configuration of networking, port-forwarding and capacity allocation.
 
 ## Building the image
