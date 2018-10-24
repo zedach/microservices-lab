@@ -24,7 +24,7 @@ image::debezium-demo.png[debezium-demo]
 
 === Setting Up the Example Application
 
-We've prepared a small https://github.com/strimzi/strimzi-lab/tree/master/hiking-demo[CRUD microservice for managing hikes], which we'll use in the following as source of data change events.
+We've prepared a small https://github.com/debezium/microservices-lab/tree/master/hiking-demo[CRUD microservice for managing hikes], which we'll use in the following as source of data change events.
 It is based on https://thorntail.io/[Thorntail], an approach for building microservices using Java EE and MicroProfile, and uses MySQL as its database.
 
 Start a MySQL instance by running:
