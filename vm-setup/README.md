@@ -10,7 +10,7 @@ After a while the new virtual machine will be spawned and you could log to it vi
 In this case the user is responsible for configuration of networking, port-forwarding and capacity allocation.
 
 ## Building the image
-To build the image from scratch it is necessary to folow this procedure
+To build the image from scratch it is necessary to follow this procedure
 * Use `Vagrantfile.build`as the Vagrant configuration file.
 * Start the virtual machine using `vagrant up`.
 * Log into virtual machine using `vagrant ssh`.
