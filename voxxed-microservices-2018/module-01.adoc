@@ -64,7 +64,7 @@ After you have completed all modules in this workshop then you can clean up the 
 
 [source,sh]
 $ oc cluster down
-$ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount && sudo rm -rf $HOME/openshift.local.clusterup
+$ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount; sudo rm -rf $HOME/openshift.local.clusterup
 
 === Installing Strimzi
 
@@ -166,7 +166,7 @@ TODO: decide on ZK nodes
 
 [source, sh]
 # $ oc apply -f examples/kafka/kafka-ephemeral.yaml
-$ oc process strimzi-ephemeral -p ZOOKEEPER_NODE_COUNT=1 | oc apply -f -
+$ oc process strimzi-ephemeral -p ZOOKEEPER_NODE_COUNT=1 -p KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -p KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 | oc apply -f -
 kafka "my-cluster" created
 
 Let's take a look at the resource we've created:
@@ -365,14 +365,14 @@ Before starting to develop data streaming applications and running them, let's s
 
 ==== Updating Kafka cluster
 
-Starting from the current Kafka cluster with 3 brokers, we want to add two more.
+Starting from the current Kafka cluster with 3 brokers, we want to scale down to one as it is sufficient in development environment.
 In order to do that, the related `my-cluster` resource needs to be updated using the "edit" command provided by the `oc` tool.
 
 [source,sh]
 $ oc edit kafka my-cluster
 
-It opens the default editor that we can use in order to change the value of the `kafka/replicas` field from 3 to 5.
-After saving the file, the Cluster Operator detects the update and starts a two new broker Pods; it's just a simple scale-up operation.
+It opens the default editor that we can use in order to change the value of the `kafka/replicas` field from 3 to 1.
+After saving the file, the Cluster Operator detects the update and removes two broker pods; it's just a simple scale-down operation.
 You can see this by visualizing the pods again:
 
 [source,sh]
@@ -380,56 +380,11 @@ $ oc get pods
 NAME                                          READY     STATUS    RESTARTS   AGE
 my-cluster-entity-operator-549b687c88-gb4w9   3/3       Running   0          45m
 my-cluster-kafka-0                            2/2       Running   0          46m
-my-cluster-kafka-1                            2/2       Running   0          46m
-my-cluster-kafka-2                            2/2       Running   0          46m
-my-cluster-kafka-3                            2/2       Running   0          18m
-my-cluster-kafka-4                            2/2       Running   0          18m
 my-cluster-zookeeper-0                        2/2       Running   0          38s
 strimzi-cluster-operator-5bbcc486fc-hwswp     1/1       Running   0          47m
 
-Notice the new pods `my-cluster-kafka-3` and `my-cluster-kafka-4`.
-For the rest of the lab, we only need three Kafka brokers, so we recommend to size down the cluster to 3 nodes, by editing the `kafka/replicas` field of the `kafka` resouce again.
-Also only a single ZooKeeper node (field `zookeeper/replicas) will be needed:
-
-[source,sh]
-$ oc edit kafka my-cluster
-
-Set the `kafka-nodes` field back to 3 and check that the two additional pods have been shut down.
-
-[source,sh]
-$ oc get pods
-NAME                                           READY     STATUS    RESTARTS   AGENAME                                          READY     STATUS    RESTARTS   AGE
-my-cluster-entity-operator-549b687c88-gb4w9   3/3       Running   0          50m
-my-cluster-kafka-0                            2/2       Running   0          51m
-my-cluster-kafka-1                            2/2       Running   0          51m
-my-cluster-kafka-2                            2/2       Running   0          51m
-my-cluster-zookeeper-0                        2/2       Running   0          3m
-strimzi-cluster-operator-5bbcc486fc-hwswp     1/1       Running   0          51m
-
-Now we want to do something more interesting like changing a Kafka broker configuration parameter, for example the `KAFKA_DEFAULT_REPLICATION_FACTOR` one modifying its value from 1 to 2.
-
-Before doing that let's check that the default replication factor is 1 getting the log from one of the running brokers.
-
-[source,sh]
-$ oc logs my-cluster-kafka-0 -c kafka | grep default.replication.factor
-  default.replication.factor = 1
-  default.replication.factor = 1
-
-In the same way as before you can use the "edit" command and updating that value in the default editor.
-
-[source,sh]
-$ oc edit kafka my-cluster
-
-This kind of update is much more complex because changing the Kafka broker configuration we want all the running brokers to be updated so it means that each broker needs to be restarted in order to get the new configuration.
-In this case, detecting the resource update, the Cluster Operator starts a "rolling update" and each broker Pod is killed one by one and then restarted with the new configuration.
-
-When the "rolling update" is finished we can check that the default replication factor is changed to 2.
-
-[source,sh]
-$ oc logs my-cluster-kafka-0 -c kafka | grep default.replication.factor
-default.replication.factor=2
-	default.replication.factor = 2
-	default.replication.factor = 2
+Notice the pods `my-cluster-kafka-1` and `my-cluster-kafka-2` has disappeared.
+For the rest of the lab, we recommend keep the size to one node.
 
 ==== Handling topics
 
@@ -442,9 +397,9 @@ kafkatopic "my-topic" created
 In order to check that the Topic Operator has detected the new resource and created a related topic in the Kafka cluster, we can run the official `kafka-topics.sh` tool on one of the brokers.
 
 [source,sh]
-$ oc exec -it my-cluster-kafka-0 -- bin/kafka-topics.sh --zookeeper localhost:2181 --describe
+$ oc exec -it my-cluster-kafka-0 -c kafka -- bin/kafka-topics.sh --zookeeper localhost:2181 --describe
 Topic:my-topic	PartitionCount:1	ReplicationFactor:1	Configs:segment.bytes=1073741824,retention.ms=7200000
-	Topic: my-topic	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: my-topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
 
 You also can examine the topic resource itself using `oc describe`:
 
@@ -487,10 +442,10 @@ The Topic Operator updates the related Kafka topic accordingly.
 We can check that describing the topic one more time.
 
 [source,sh]
-$ oc exec -it my-cluster-kafka-0 -- bin/kafka-topics.sh --zookeeper localhost:2181 --describe
+$ oc exec -it my-cluster-kafka-0 -c kafka -- bin/kafka-topics.sh --zookeeper localhost:2181 --describe
 Topic:my-topic	PartitionCount:3	ReplicationFactor:1	Configs:segment.bytes=1073741824,retention.ms=7200000
-	Topic: my-topic	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
-	Topic: my-topic	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
+	Topic: my-topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+	Topic: my-topic	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
 	Topic: my-topic	Partition: 2	Leader: 0	Replicas: 0	Isr: 0
 
 Finally, a topic can be deleted like so:
@@ -503,7 +458,7 @@ The Topic Operator detects the deletion of the resource and deletes the related 
 We can check that listing the available topics.
 
 [source,sh]
-$ oc exec -it my-cluster-kafka-0 -- bin/kafka-topics.sh --zookeeper localhost:2181 --list
+$ oc exec -it my-cluster-kafka-0 -c kafka -- bin/kafka-topics.sh --zookeeper localhost:2181 --list
 
 This time the output should be empty.
 
