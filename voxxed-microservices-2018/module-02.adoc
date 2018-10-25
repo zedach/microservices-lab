@@ -124,7 +124,7 @@ Then take a look at the logs of the invoice application:
 
 [source,sh]
 ----
-oc logs $(oc get pods -o name -l app=invoice-msa)
+$ oc logs $(oc get pods -o name -l app=invoice-msa)
 ----
 
 You should see messages like this:
@@ -133,3 +133,9 @@ You should see messages like this:
 ----
 2018-10-25 07:17:08,412 INFO  [io.debezium.examples.ticketmsa.invoice.InvoiceService] (EE-ManagedExecutorService-default-Thread-1) Order event '{"id":7,"firstName":"John","lastName":"Doe","email":"john.doe@example.com","price":1000}' arrived
 ----
+
+Once done with this part of the workshop, delete the two applications like so:
+
+[source,sh]
+$ oc delete all -l app=invoice-msa
+$ oc delete all -l app=order-msa
