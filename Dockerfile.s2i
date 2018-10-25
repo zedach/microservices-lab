@@ -1,0 +1,17 @@
+# Build with `docker build -f Dockerfile.s2i -t debezium/msa-lab-s2i .`
+FROM fabric8/s2i-java
+COPY --chown=1000:1000 eventr eventr
+COPY --chown=1000:1000 debezium-thorntail-demo debezium-thorntail-demo
+COPY --chown=1000:1000 ticket-msa ticket-msa
+RUN cd eventr &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean install &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean &&\
+cd ../debezium-thorntail-demo &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean install &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean &&\
+cd ../ticket-msa/invoice &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean install &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean &&\
+cd ../../ticket-msa/order &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean install &&\
+mvn -Dmaven.repo.local=/tmp/artifacts/m2 clean
