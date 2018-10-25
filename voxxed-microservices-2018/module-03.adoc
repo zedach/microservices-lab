@@ -7,7 +7,7 @@ Streaming data changes from your database enables many interesting use cases suc
 
 * Replicating data across databases by different vendors
 * Synchronizing data between microservices
-* Updating fulltext search indexes (e.g. Elasticsearch) or caches (e.g. https://www.redhat.com/de/technologies/jboss-middleware/data-grid[JBoss Data Grid])
+* Updating fulltext search indexes (e.g. Elasticsearch) or caches (e.g. https://www.redhat.com/en/technologies/jboss-middleware/data-grid[JBoss Data Grid])
 * Running stream queries such as sliding averages of the value of incoming orders etc.
 
 In this module of the lab you'll learn the following things:
