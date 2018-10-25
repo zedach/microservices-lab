@@ -39,37 +39,29 @@ In the following, update _ticket-msa/order/src/main/java/io/debezium/examples/ti
 
 * Add the `@KafkaConfig` annotation to the class, which will inject the required Kafka configuration:
 
-    ```
     @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
     public class OrderService {
         ...
     }
-    ```
 
 * Add a field for injecting the topic name to send to (The MicroProfile Config API is used for this):
 
-    ```
     @Inject
     @ConfigProperty(name="order.topic.name", defaultValue="orders")
     private String topicName;
-    ```
 
 * Add a field for injecting the Kafka producer:
 
-    ```
     @Producer
     private SimpleKafkaProducer<Integer, JsonObject> kafka;
-    ```
 
 * Adjust the `addOrder()` method so it sends a message to Kafka:
 
-    ```
     public Order addOrder(Order order) {
         order = entityManager.merge(order);
         kafka.send(topicName, order.getId(), order.toJson());
         return order;
     }
-    ```
 
 Eventually, the class should look like https://github.com/debezium/microservices-lab/blob/master/ticket-msa/order/src/main/java/io/debezium/examples/ticketmsa/order/OrderService.java[this].
 
@@ -112,7 +104,7 @@ $ oc patch service order-msa -p '{ "spec" : { "ports" : [{ "name" : "8080-tcp", 
 $ oc expose svc order-msa
 
 It's also a good idea to convert the application's build into an "incremental build",
-which will avoid refetching all dependencies from remote Maven repostories after the first build:
+which will avoid refetching all dependencies from remote Maven repositories after the first build:
 
 [source,sh]
 $ oc patch bc/order-msa -p '{"spec":{"strategy":{"sourceStrategy":{"incremental":true}}}}'
@@ -174,21 +166,17 @@ Change to your local checkout again, and edit the file _ticket-msa/invoice/src/m
 
 * Add the `@KafkaConfig` annotation to the class, which will inject the required Kafka configuration:
 
-    ```
     @KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
-    public class OrderService {
+    public class InvoiceService {
         ...
     }
-    ```
 
 * Add an event handler method which will be invoked by the Kafka CDI extension for each message received on the "myorders" topic (the actual value is injected via an environment variable):
 
-    ```
     @Consumer(topics = "#{ORDER_TOPIC_NAME}", groupId = "InvoiceService")
     public void orderArrived(final String order) {
         LOGGER.info("Order event '{}' arrived", order);
     }
-    ```
 
 Eventually, the file should look like https://github.com/debezium/microservices-lab/blob/master/ticket-msa/invoice/src/main/java/io/debezium/examples/ticketmsa/invoice/InvoiceService.java[this].
 

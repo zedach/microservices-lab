@@ -31,8 +31,10 @@ It is based on https://thorntail.io/[Thorntail], an approach for building micros
 Start a MySQL instance by running:
 
 [source, sh]
-$ oc new-app --name=mysql debezium/example-mysql:0.8
-$ oc set env dc/mysql MYSQL_ROOT_PASSWORD=debezium MYSQL_USER=mysqluser MYSQL_PASSWORD=mysqlpw
+$ oc new-app --name=mysql debezium/example-mysql:0.8 \
+    -e MYSQL_ROOT_PASSWORD=debezium \
+    -e MYSQL_USER=mysqluser \
+    -e MYSQL_PASSWORD=mysqlpw
 
 Then build and start the application.
 This uses the https://github.com/fabric8/s2i-java[Fabric8 S2I] ("source to image") builder image which will fetch the application's source code from the given location, build it using Maven and then run the Thorntail uber JAR:
