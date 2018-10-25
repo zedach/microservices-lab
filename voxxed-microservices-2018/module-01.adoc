@@ -1,4 +1,5 @@
 == Deploying an Apache Kafka cluster with Strimzi
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 
 Let's get started by deploying an Apache Kafka cluster on OpenShift.
 For this, we will use http://strimzi.io/[Strimzi], an open-source project that simplifies the process of deploying and managing Apache Kafka clusters on Kubernetes and OpenShift.
@@ -46,10 +47,10 @@ $ sudo su - build
 
 === Starting OpenShift
 
-Start up OpenShift (use IP address `192.168.33.10` when using Vagrant):
+Start up OpenShift (replace the IP address with your actual value when not using Vagrant or using Vagrant with a different IP):
 
 [source, sh]
-$ oc cluster up --routing-suffix=<YOUR SERVER IP>.nip.io
+$ oc cluster up --routing-suffix=192.168.33.10.nip.io
 
 This make take a few minutes.
 
@@ -65,6 +66,8 @@ After you have completed all modules in this workshop then you can clean up the 
 [source,sh]
 $ oc cluster down
 $ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount; sudo rm -rf $HOME/openshift.local.clusterup
+
+Note: don't execute these steps now, but only at the end of the lab.
 
 === Installing Strimzi
 
@@ -162,10 +165,7 @@ For this lab, we will use a template (so to bootstrap only a single ZooKeeper no
 but you could create a resource file from scratch as well or use one from _examples/kafka_.
 We will deploy 3 instances of Kafka broker (the default) and one instance of ZooKeeper.
 
-TODO: decide on ZK nodes
-
 [source, sh]
-# $ oc apply -f examples/kafka/kafka-ephemeral.yaml
 $ oc process strimzi-ephemeral -p ZOOKEEPER_NODE_COUNT=1 -p KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -p KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 | oc apply -f -
 kafka "my-cluster" created
 
@@ -180,35 +180,26 @@ Annotations:  kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"ka
 API Version:  kafka.strimzi.io/v1alpha1
 Kind:         Kafka
 Metadata:
-  Cluster Name:
-  Creation Timestamp:  2018-10-09T14:46:14Z
-  Resource Version:    1574
+  Creation Timestamp:  2018-10-25T16:44:07Z
+  Generation:          1
+  Resource Version:    2746
   Self Link:           /apis/kafka.strimzi.io/v1alpha1/namespaces/voxxed/kafkas/my-cluster
-  UID:                 12450129-cbd2-11e8-b135-96000011cbea
+  UID:                 30e91dbe-d875-11e8-9a35-96000012a06f
 Spec:
   Entity Operator:
     Topic Operator:
     User Operator:
   Kafka:
     Config:
-      Offsets . Topic . Replication . Factor:            3
-      Transaction . State . Log . Min . Isr:             2
-      Transaction . State . Log . Replication . Factor:  3
+      Default . Replication . Factor:                    1
+      Offsets . Topic . Replication . Factor:            1
+      Transaction . State . Log . Replication . Factor:  1
     Listeners:
       Plain:
       Tls:
     Liveness Probe:
       Initial Delay Seconds:  15
       Timeout Seconds:        5
-    Metrics:
-      Lowercase Output Name:  true
-      Rules:
-        Name:     kafka_server_$1_$2_total
-        Pattern:  kafka.server<type=(.+), name=(.+)PerSec\w*><>Count
-        Labels:
-          Topic:  $3
-        Name:     kafka_server_$1_$2_total
-        Pattern:  kafka.server<type=(.+), name=(.+)PerSec\w*, topic=(.+)><>Count
     Readiness Probe:
       Initial Delay Seconds:  15
       Timeout Seconds:        5
@@ -219,8 +210,6 @@ Spec:
     Liveness Probe:
       Initial Delay Seconds:  15
       Timeout Seconds:        5
-    Metrics:
-      Lowercase Output Name:  true
     Readiness Probe:
       Initial Delay Seconds:  15
       Timeout Seconds:        5
@@ -261,10 +250,12 @@ The deployed Kafka broker instances and the ZooKeeper are by default configured 
 This is usually undesirable so we will set OpenShift limits to them so each of the pods will receive only allocated portion of memory which is 1 GB in case of each broker instance and 512 MB in case of ZooKeeper.
 The CPU pressure is not so important in our case so we will keep it unlimited.
 
-To limit the RAM we need to configure the kafka resource we have seen above using the patch command
+To limit the RAM we need to configure the Kafka resource we have seen above using the patch command:
 
 [source,sh]
 $ oc patch kafka my-cluster --type merge -p '{ "spec" : { "zookeeper" : { "resources" : { "limits" : { "memory" : "512Mi" }, "requests" : { "memory" : "512Mi" } } },  "kafka" : { "resources" : { "limits" : { "memory" : "1Gi" }, "requests" : { "memory" : "1Gi" } } } } }'
+
+This will restart all broker nodes, again use `oc get pods -w` to verify that they are all up again.
 
 === Monitoring with Prometheus and Grafana
 
@@ -383,7 +374,7 @@ my-cluster-kafka-0                            2/2       Running   0          46m
 my-cluster-zookeeper-0                        2/2       Running   0          38s
 strimzi-cluster-operator-5bbcc486fc-hwswp     1/1       Running   0          47m
 
-Notice the pods `my-cluster-kafka-1` and `my-cluster-kafka-2` has disappeared.
+Notice the pods `my-cluster-kafka-1` and `my-cluster-kafka-2` are first in state "Terminating" and should then disappear after a while.
 For the rest of the lab, we recommend keep the size to one node.
 
 ==== Handling topics
@@ -463,4 +454,4 @@ $ oc exec -it my-cluster-kafka-0 -c kafka -- bin/kafka-topics.sh --zookeeper loc
 This time the output should be empty.
 
 Now your Kafka cluster is running and ready to go.
-Let's build some applications!
+Let's continue with <<module-02#,module 2>> and build some applications!

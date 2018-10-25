@@ -1,7 +1,9 @@
 == Environment
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 
-This workshop requires a prepared environment for running OpenShift.
-A Vagrant box is provided for setting up this environment on your local machine.
+This workshop requires a prepared environment for running OpenShift
+(specifically, https://www.okd.io/[okd], "the Origin Community Distribution of Kubernetes that powers Red Hat OpenShift").
+A https://www.vagrantup.com/[Vagrant box] is provided for setting up this environment on your local machine.
 Please perform the following steps before coming to the workshop.
 
 === Requirements
@@ -14,14 +16,22 @@ Please perform the following steps before coming to the workshop.
 
 === Set-Up
 
-Clone the workshop repo:
+Begin by creating a fork of the https://github.com/debezium/microservices-lab[microservices-lab] GitHub repository under your own GitHub user.
+Then clone your forked repository to your _local machine_, add the upstream repo as another remote repository and pull the latest changes from `upstream/master`:
 
 [source, sh]
-git clone https://github.com/debezium/microservices-lab.git
-cd microservices-lab/vm-setup
+git clone git@github.com:<your user>/microservices-lab.git
+cd microservices-lab
+git remote add upstream git@github.com:debezium/microservices-lab.git
+git pull upstream master
+
+Change to the _vm-setup_ directory:
+
+[source, sh]
+cd vm-setup
 
 Note: The VM definition (in _Vagrantfile_) uses a fixed IP of 192.168.33.10.
-Please change it to a different value in the same network should this address already be used by a different machine.
+Please change it to a different value in the same network, should this address already be used by a different machine.
 
 Provision the VM using Vagrant:
 
@@ -57,4 +67,4 @@ Provision the environment using Ansible:
 [source, sh]
 ansible-playbook -i hosts site.yml
 
-Now, let's start the lab.
+Now, let's start the lab with <<module-01#,module 1>>.

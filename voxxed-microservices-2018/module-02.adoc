@@ -1,4 +1,5 @@
 == Using the Kafka API to exchange data between two microservices
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 
 In this part of the workshop we're going to use the Kafka to propagate data from one microservice to another.
 
@@ -10,15 +11,15 @@ You'll learn the following things:
 We have prepared two simple microservices, one which receives "customer orders" via a REST API and another one which should get hold of any order in order to produce "invoices".
 The services are based on https://thorntail.io/[Thorntail], an approach for building microservices using Java EE and MicroProfile.
 
-=== Cloning the Example Services
+=== Preparing the Example Services
 
-Begin by creating a fork of the https://github.com/debezium/microservices-lab[microservices-lab] GitHub repository under your own GitHub user.
-Then clone your forked repository to your _local machine_ and check out the "module2-start" branch:
+On your host machine, go to your checkout of the https://github.com/debezium/microservices-lab[microservices-lab] GitHub repository,
+fetch the latest contents from the upstream repo and check out a new branch "module2" based on the branch "upstream/module2-start".
 
 [source, sh]
-git clone git@github.com:<your user>/microservices-lab.git
 cd microservices-lab
-git checkout -b module2 origin/module2-start
+git fetch upstream
+git checkout -b module2 upstream/module2-start
 
 Import the two projects _ticket-msa/order_ and _ticket-msa/invoice_ into your preferred IDE.
 
@@ -81,8 +82,10 @@ git push origin module2
 Now change to the VM where you have started OpenShift and start a MySQL instance by running:
 
 [source, sh]
-$ oc new-app --name=mysql debezium/example-mysql:0.8
-$ oc set env dc/mysql MYSQL_ROOT_PASSWORD=debezium MYSQL_USER=mysqluser MYSQL_PASSWORD=mysqlpw
+$ oc new-app --name=mysql debezium/example-mysql:0.8 \
+    -e MYSQL_ROOT_PASSWORD=debezium \
+    -e MYSQL_USER=mysqluser \
+    -e MYSQL_PASSWORD=mysqlpw
 
 Then build and start the application.
 This uses the https://github.com/fabric8/s2i-java[Fabric8 S2I] ("source to image") builder image.
@@ -115,7 +118,8 @@ which will avoid refetching all dependencies from remote Maven repostories after
 $ oc patch bc/order-msa -p '{"spec":{"strategy":{"sourceStrategy":{"incremental":true}}}}'
 
 Once the application and its database are running
-(use `oc get pods` to verify, alternatively, examine the "order-msa" application's status in the OpenShift web console),
+(use `oc get pods` to verify, alternatively, examine the "order-msa" application's status in the OpenShift web console;
+note that after the pod deployment the application itself needs a few seconds until it's ready to accept requests),
 you can place "orders" by submitting requests like this to the application's REST API:
 
 [source]
@@ -235,7 +239,7 @@ In this part of the lab you've learned how to propagate data between two microse
 
 There's one potential problem, though: the "order" application writes data to its database _and_ Kafka at the same time.
 As these two resources are not modified within a single global transaction, it might happen that inconsistencies occur e.g. when the change is applied to the database but the write to Kafka failed for some reason.
-In the following part we'll introduce an alternative approach which avoids these issues by tracking changes in the database in order to write them into Kafka.
+In the <<module-03#,module 3>> we'll introduce an alternative approach which avoids these issues by tracking changes in the database in order to write them into Kafka.
 This is known as "change data capture".
 
 Once done with this part of the workshop, delete the two applications and the database like so:
