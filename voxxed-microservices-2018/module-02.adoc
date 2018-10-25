@@ -238,8 +238,9 @@ As these two resources are not modified within a single global transaction, it m
 In the following part we'll introduce an alternative approach which avoids these issues by tracking changes in the database in order to write them into Kafka.
 This is known as "change data capture".
 
-Once done with this part of the workshop, delete the two applications like so:
+Once done with this part of the workshop, delete the two applications and the database like so:
 
 [source,sh]
 $ oc delete all -l app=invoice-msa
 $ oc delete all -l app=order-msa
+$ oc delete all -l app=mysql
