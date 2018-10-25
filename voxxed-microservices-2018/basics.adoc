@@ -10,6 +10,7 @@ Please perform the following steps before coming to the workshop.
 * Vagrant 2.x installed
 * Resources to run the VM with 6 GB of RAM and two virtual CPUs
 * Java 1.8 and Maven installed if you'd like to adjust the source code of any of the examples
+* A GitHub account
 
 === Set-Up
 
