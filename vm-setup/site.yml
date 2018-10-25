@@ -28,6 +28,7 @@
        - dnf-plugins-core
        - bash-completion
        - libselinux-python
+       - jq
   - name: have build user
     user:
       name: build
