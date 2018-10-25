@@ -25,6 +25,17 @@ cd microservices-lab
 git remote add upstream git@github.com:debezium/microservices-lab.git
 git pull upstream master
 
+=== Build the Projects
+
+In order to obtain all the needed Maven dependencies before coming to the workshop, run the following builds once:
+
+[source, sh]
+mvn clean install -f eventr/pom.xml
+mvn clean install -f ticket-msa/invoice/pom.xml
+mvn clean install -f ticket-msa/order/pom.xml
+
+=== Provision Vagrant Box
+
 Change to the _vm-setup_ directory:
 
 [source, sh]
@@ -43,6 +54,11 @@ Once that's done, you should be able to SSH into the box:
 
 [source, sh]
 vagrant ssh
+
+Verify you can run `sudo su - build`. After that, exit the box and shut it down:
+
+[source, sh]
+vagrant halt
 
 === Alternative: Set-Up on Custom Cloud Box
 
