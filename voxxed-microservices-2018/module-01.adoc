@@ -166,7 +166,7 @@ but you could create a resource file from scratch as well or use one from _examp
 We will deploy 3 instances of Kafka broker (the default) and one instance of ZooKeeper.
 
 [source, sh]
-$ oc process strimzi-ephemeral -p ZOOKEEPER_NODE_COUNT=1 -p KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -p KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 | oc apply -f -
+$ oc process strimzi-persistent -p ZOOKEEPER_NODE_COUNT=1 -p KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -p KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 | oc apply -f -
 kafka "my-cluster" created
 
 Let's take a look at the resource we've created:
