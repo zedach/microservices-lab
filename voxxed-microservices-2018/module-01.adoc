@@ -88,16 +88,16 @@ $ oc login -u developer
 
 ==== Environment cleanup
 
+[NOTE]
+====
+Don't execute these steps now, but only at the end of the lab.
+====
+
 After you have completed all modules in this workshop then you can clean up the environment by issuing these commands:
 
 [source,sh]
 $ oc cluster down
 $ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount; sudo rm -rf $HOME/openshift.local.clusterup
-
-[NOTE]
-====
-Note: don't execute these steps now, but only at the end of the lab.
-====
 
 === Installing Strimzi
 
@@ -499,5 +499,9 @@ $ oc exec -it my-cluster-kafka-0 -c kafka -- bin/kafka-topics.sh --zookeeper loc
 
 This time the output should be empty.
 
-Now your Kafka cluster is running and ready to go.
-Let's continue with <<module-02#,module 2>> and build some applications!
+Finally, let's switch from the admin account to the developer one:
+
+[source,sh]
+$ oc login -u developer
+
+Now that your Kafka cluster is running and ready to go, let's continue with <<module-02#,module 2>> and build some applications!
