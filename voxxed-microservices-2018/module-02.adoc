@@ -114,10 +114,41 @@ which will avoid refetching all dependencies from remote Maven repositories afte
 [source,sh]
 $ oc patch bc/order-msa -p '{"spec":{"strategy":{"sourceStrategy":{"incremental":true}}}}'
 
-Once the application and its database are running
-(use `oc get pods` to verify, alternatively, examine the "order-msa" application's status in the OpenShift web console;
-note that after the pod deployment the application itself needs a few seconds until it's ready to accept requests),
-you can place "orders" by submitting requests like this to the application's REST API:
+Use `oc get pods` to verify that the build has completed and the application is running:
+
+[source,sh]
+----
+$ oc get pods
+NAME                                          READY     STATUS      RESTARTS   AGE
+order-msa-1-build                             0/1       Completed   0          58s
+order-msa-1-hwdp8                             1/1       Running     0          5s
+...
+----
+
+You also can take a look at the logs of the build:
+
+[source,sh]
+----
+$ oc logs order-msa-1-build
+...
+Pushed 30/31 layers, 97% complete
+Pushed 31/31 layers, 100% complete
+Push successful
+----
+
+After a while, the logs of the application itself should say that Thorntail has started:
+
+[source,sh]
+----
+oc logs $(oc get pods -o name -l app=order-msa)
+...
+2018-10-26 09:03:12,532 INFO  [org.jboss.as.server] (main) WFLYSRV0010: Deployed "order.war" (runtime-name : "order.war")
+2018-10-26 09:03:12,548 INFO  [org.wildfly.swarm] (main) THORN99999: Thorntail is Ready
+----
+
+Alternatively, examine the "order-msa" application's status in the OpenShift web console.
+
+Now you can place "orders" by submitting requests like this to the application's REST API:
 
 [source]
 ----
@@ -212,7 +243,7 @@ $ oc expose svc invoice-msa
 $ oc patch bc/invoice-msa -p '{"spec":{"strategy":{"sourceStrategy":{"incremental":true}}}}'
 ----
 
-Once the example application has started, it will simply logs each order message it receives.
+Once the example application has started (verify similarly to the order service above), it will simply logs each order message it receives.
 Send another POST request to the order service as shown above.
 Then take a look at the logs of the invoice application:
 
