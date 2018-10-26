@@ -1,5 +1,6 @@
 == Deploying an Apache Kafka cluster with Strimzi
 ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+:imagesdir: ./images
 
 Let's get started by deploying an Apache Kafka cluster on OpenShift.
 For this, we will use http://strimzi.io/[Strimzi], an open-source project that simplifies the process of deploying and managing Apache Kafka clusters on Kubernetes and OpenShift.

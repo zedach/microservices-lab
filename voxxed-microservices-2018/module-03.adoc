@@ -1,4 +1,5 @@
 == Change Data Capture with Kafka Connect and Debezium
+:imagesdir: ./images
 
 This part of the lab introduces you to change data capture (CDC) using http://debezium.io/[Debezium].
 Debezium allows you to capture data changes from MySQL, Postgres, MongoDB, Oracle and SQL Server and stream those events into Apache Kafka.
