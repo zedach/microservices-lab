@@ -396,7 +396,7 @@ In order to do that, the related `my-cluster` resource needs to be updated using
 
 $ oc edit kafka my-cluster
 
-It opens the default editor that we can use in order to change the value of the `kafka/replicas` field from 3 to 1.
+It opens the default editor that we can use in order to change the value of the `spec/kafka/replicas` field from 3 to 1 (quite toward the end of the `kafka` section).
 After saving the file, the Cluster Operator detects the update and removes two broker pods; it's just a simple scale-down operation.
 You can see this by visualizing the pods again:
 
