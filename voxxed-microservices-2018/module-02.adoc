@@ -80,12 +80,17 @@ $ oc new-app --name=mysql debezium/example-mysql:0.8 \
     -e MYSQL_PASSWORD=mysqlpw
 
 Then build and start the application.
-This uses the https://github.com/fabric8/s2i-java[Fabric8 S2I] ("source to image") builder image.
-It will fetch the application's source code from the given location, build it using Maven and then run the Thorntail uber JAR:
+We're going to use https://docs.okd.io/latest/using_images/s2i_images/index.html[OpenShift's S2I] ("source to image") process for this.
+The S2I process will fetch the application's source code from the given GitHub location, build it using Maven and then run the uber JAR produced by the Thorntail Maven plug-in.
+
+We are using a special S2I builder image prepared for this workshop, which already contains all the Maven dependencies needed by the build.
+This avoids having to download all these dependencies from the Maven Central repository.
+This S2I image is based on the upstream https://github.com/fabric8/s2i-java[Fabric8 S2I] builder image,
+which can be used for building and running Java applications on OpenShift.
 
 [source,sh]
 ----
-$ oc new-app --name=order-msa fabric8/s2i-java:latest~https://github.com/<your fork>/microservices-lab#module2 \
+$ oc new-app --name=order-msa debezium/msa-lab-s2i:latest~https://github.com/<your fork>/microservices-lab#module2 \
     --context-dir=ticket-msa/order \
     -e MYSQL_DATABASE=inventory \
     -e AB_PROMETHEUS_OFF=true \
@@ -192,7 +197,7 @@ The steps are the same as above, only that we're building the invoice applicatio
 
 [source,sh]
 ----
-$ oc new-app --name=invoice-msa fabric8/s2i-java:latest~https://github.com/<your fork>/microservices-lab#module2 \
+$ oc new-app --name=invoice-msa debezium/msa-lab-s2i:latest~https://github.com/<your fork>/microservices-lab#module2 \
     --context-dir=ticket-msa/invoice \
     -e AB_PROMETHEUS_OFF=true \
     -e KAFKA_SERVICE_HOST=my-cluster-kafka-bootstrap \

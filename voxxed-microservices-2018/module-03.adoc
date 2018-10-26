@@ -37,11 +37,11 @@ $ oc new-app --name=mysql debezium/example-mysql:0.8 \
     -e MYSQL_PASSWORD=mysqlpw
 
 Then build and start the application.
-This uses the https://github.com/fabric8/s2i-java[Fabric8 S2I] ("source to image") builder image which will fetch the application's source code from the given location, build it using Maven and then run the Thorntail uber JAR:
+Again we're using the source-to-image process for that:
 
 [source,sh]
 ----
-$ oc new-app --name=eventrapp fabric8/s2i-java:latest~https://github.com/debezium/microservices-lab \
+$ oc new-app --name=eventrapp debezium/msa-lab-s2i:latest~https://github.com/debezium/microservices-lab \
     --context-dir=eventr \
     -e AB_PROMETHEUS_OFF=true \
     -e JAVA_OPTIONS=-Djava.net.preferIPv4Stack=true
@@ -65,7 +65,6 @@ Verify that the pods of the database and the application are running:
 $ oc get pods
 ----
 
-The S2I build will take some time, as it has to fetch all the required Maven dependencies and plug-ins.
 Once the build has completed, you should see the following status
 (the build job must be "Completed", the actual application and the database "Running"):
 
