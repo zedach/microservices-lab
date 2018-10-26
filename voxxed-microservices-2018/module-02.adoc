@@ -44,7 +44,7 @@ In the following, update _ticket-msa/order/src/main/java/io/debezium/examples/ti
         ...
     }
 
-* Add a field for injecting the topic name to send to (The MicroProfile Config API is used for this):
+* Add a field for injecting the topic name to send to; the https://github.com/eclipse/microprofile-config[Eclipse MicroProfile Config API] is used for this. This API helps to make applications configurable, e.g. via configuration files and environment variables. The property `order.topic.name` can now be configured via the environment variable `ORDER_TOPIC_NAME`:
 
     @Inject
     @ConfigProperty(name="order.topic.name", defaultValue="orders")
@@ -68,8 +68,8 @@ Eventually, the class should look like https://github.com/debezium/microservices
 Commit your change and push it to your GitHub fork:
 
 [source, sh]
-git commit -a -m "Implementing order service"
-git push origin module2
+$ git commit -a -m "Implementing order service"
+$ git push origin module2
 
 Now change to the VM where you have started OpenShift and start a MySQL instance by running:
 

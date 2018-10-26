@@ -23,7 +23,7 @@ Instead of relying on direct deployment and management of Zookeeper and Kafka cl
 For creating an Apache Kafka cluster, for instance, you need to create a resource of type `kafka` that describes the properties of the cluster, and the *_cluster operator_* will deploy the cluster for you.
 If you need to change the state of the cluster, for example for changing properties or for adding new instances, all you have to do is to modify the resource and the changes will be rolled out accordingly.
 
-Topic management works in a similar fashion: for creating and modifying topics, you only need to create and edit a set of resources of type `kafkatopic` and the *_topic operator* will do the work for you.
+Topic management works in a similar fashion: for creating and modifying topics, you only need to create and edit a set of resources of type `kafkatopic` and the *_topic operator_* will do the work for you.
 
 You will do all this as part of the first lab.
 
@@ -33,19 +33,45 @@ First, connect via SSH to the Vagrant VM on your machine or your remote cloud en
 For a local Vagrant box run:
 
 [source, sh]
+$ vagrant up
 $ vagrant ssh
+
+[NOTE]
+====
+If you have the Vagrant vbguest plug-in installed, you may run into this error:
+
+[source, sh]
+----
+==> default: Checking for guest additions in VM...
+The following SSH command responded with a non-zero exit status.
+Vagrant assumes that this means the command failed!
+
+ setup
+
+Stdout from the command:
+
+Stderr from the command:
+
+bash: line 4: setup: command not found
+----
+
+Try running the following in this case:
+
+[source, sh]
+$ vagrant vbguest --do install
+====
 
 Otherwise, run:
 
 [source, sh]
 $ ssh <YOUR SERVER IP>
 
+=== Starting OpenShift
+
 Switch to the `build` user:
 
 [source, sh]
 $ sudo su - build
-
-=== Starting OpenShift
 
 Start up OpenShift (replace the IP address with your actual value when not using Vagrant or using Vagrant with a different IP):
 
@@ -67,7 +93,10 @@ After you have completed all modules in this workshop then you can clean up the 
 $ oc cluster down
 $ mount | grep -o '/home/build/openshift.local.clusterup/[^ ]*' | xargs sudo umount; sudo rm -rf $HOME/openshift.local.clusterup
 
+[NOTE]
+====
 Note: don't execute these steps now, but only at the end of the lab.
+====
 
 === Installing Strimzi
 
@@ -82,24 +111,26 @@ Enter the `strimzi-0.8.0` directory.
 [source, sh]
 $ cd strimzi-0.8.0
 
-Adjust the namespace in the installation files to `voxxed`:
-
-[source, sh]
-$ sed -i 's/namespace: .*/namespace: voxxed/' install/cluster-operator/*RoleBinding*.yaml
-
-Next, create a new project for the lab:
+https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/[Namespaces] (or "projects" in OpenShift terms) are a concept of Kubernetes for organizing and dividing the resources of a cluster between multiple users.
+For the lab we'll create a project named "voxxed":
 
 [source, sh]
 $ oc new-project voxxed
 
-You can see that it is empty:
+We must adjust the namespace in the Strimzi installation files to match that project name,
+allowing to install Strimzi's resources into that project.
+The `sed` tool can be used to do so:
+
+[source, sh]
+$ sed -i 's/namespace: .*/namespace: voxxed/' install/cluster-operator/*RoleBinding*.yaml
+
+You can see that the project is empty:
 
 [source, sh]
 $ oc get pods
 No resources found.
 
-Log in as administrator to install Strimzi
-(use the password provided by the lab instructors):
+Log in as administrator to install Strimzi:
 
 [source,sh]
 $ oc login -u system:admin
@@ -321,7 +352,8 @@ $ oc get routes grafana -o=jsonpath='{.spec.host}{"\n"}'
 Note the output, which should be in the format `grafana-voxxed.<YOUR IP>.nip.io` and access the Grafana UI at that URL in your browser.
 Now we can set up the Prometheus data source and the Kafka dashboard.
 
-Access to the Grafana UI using `admin/admin` credentials.
+Access to the Grafana UI using `admin/admin` credentials
+(you'll be required to change the password after logging in).
 
 image::grafana_login.png[grafana login]
 
@@ -417,13 +449,17 @@ Spec:
   Replicas:           1
 Events:               <none>
 
-If you don't see the topic or the last command yield an event stating "Failure processing KafkaTopic watch event ADDED",
+[NOTE]
+====
+If you don't see the topic, or the last command yields an event stating "Failure processing KafkaTopic watch event ADDED",
 then the topic operator may have lost the connection to the ZooKeeper node.
 That's a known issue in the operator which should be fixed soon.
-For now you can work around this by deleting the entity operator pod (in which case OpenShift will restart a new instance):
+For now you can work around this by deleting the pod that runs the topic operator.
+OpenShift will automatically start a new instance:
 
 [source,sh]
 $ oc delete $(oc get pods -o name -l strimzi.io/name=my-cluster-entity-operator)
+====
 
 Let's increase the partitions number now:
 

@@ -98,7 +98,7 @@ The hostname of the exposed eventrapp service is available in the OpenShift cons
 [source]
 $ oc get routes eventrapp -o=jsonpath='{.spec.host}{"\n"}'
 
-Note the output, which should be in the format eventrapp-voxxed.192.168.33.10.nip.io and you can navigate there using a browser.
+Note the output, which should be in the format eventrapp-voxxed.192.168.33.10.nip.io and you can http://eventrapp-voxxed.192.168.33.10.nip.io[navigate there] using a browser.
 Alternatively, you could click on the application's URL within the OpenShift web UI.
 
 You can use "Populate Data" to create some example data (Click on "Search orders" after that to see the created entries).
@@ -211,7 +211,7 @@ Once that's the case, register an instance of the Debezium MySQL connector using
 
 [source]
 ----
-$ oc exec -c kafka -i my-cluster-kafka-0 -- curl -s -X POST \
+$ oc exec -c kafka -i my-cluster-kafka-0 -- curl -s  -w "\n" -X POST \
     -H "Accept:application/json" \
     -H "Content-Type:application/json" \
     http://debezium-connect-api:8083/connectors -d @- <<'EOF'
@@ -260,6 +260,8 @@ $ oc exec -c zookeeper -it my-cluster-zookeeper-0 -- /opt/kafka/bin/kafka-consol
    --property print.key=true \
    --topic EventrOrder
 ----
+
+At this point you should see messages originating from the initial snapshot performed by the connector.
 
 Note that by default topic names follow the pattern "<db server name>.<db name>.<table name>".
 By means of the `RegexRouter` in the connector configuration we've changed that so that the topic name is just the unqualified table name.
@@ -531,6 +533,15 @@ $ oc exec -c kafka -i my-cluster-kafka-0 -- curl -w "\n" -s -X GET \
 
 [source]
 ----
+# Restart "inventory-connector"
+$ oc exec -c kafka -i my-cluster-kafka-0 -- curl -w "\n" -s -X POST \
+    -H "Accept:application/json" \
+    -H "Content-Type:application/json" \
+    http://debezium-connect-api:8083/connectors/inventory-connector/restart
+----
+
+[source]
+----
 # Delete "inventory-connector" (don't run it, as we'll still need the connector in the following)
 $ oc exec -c kafka -i my-cluster-kafka-0 -- curl -w "\n" -s -X DELETE \
     -H "Accept:application/json" \
@@ -568,7 +579,7 @@ This connector can be used to propagate Kafka messages to relational databases v
 
 [source]
 ----
-$ oc exec -c kafka -i my-cluster-kafka-0 -- curl -s -X POST \
+$ oc exec -c kafka -i my-cluster-kafka-0 -- curl  -w "\n" -s -X POST \
     -H "Accept:application/json" \
     -H "Content-Type:application/json" \
     http://debezium-connect-api:8083/connectors -d @- <<'EOF'
@@ -721,6 +732,8 @@ Alternatively, you can use curl to do so:
 [source]
 $ oc exec -i my-cluster-kafka-0 -- curl -s -X GET "elasticsearch:9200/eventrorder/_search?pretty"
 
+Again create or update a few orders in the event application and you'll see how the Elasticsearch index is updated based on that.
+
 ==== Streaming Aggregate Events To Elasticsearch
 
 By default Debezium creates one Kafka topic per table captured in the source database.
@@ -755,14 +768,14 @@ The file should look like https://github.com/debezium/microservices-lab/blob/mas
 Commit the change and push it to your GitHub fork:
 
 [source, sh]
-git commit -a -m "Materializing order aggregates"
-git push origin module3
+$ git commit -a -m "Materializing order aggregates"
+$ git push origin module3
 
 Then, in the VM running OpenShift, start another build of the "eventrapp" application.
 This will fetch your change, build the application and redeploy it:
 
 [source, sh]
-oc start-build eventrapp
+$ oc start-build eventrapp
 
 Next, start a build of Kafka Connect containing the SMT mentioned above:
 
