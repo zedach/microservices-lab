@@ -36,12 +36,21 @@ $ oc new-app --name=mysql debezium/example-mysql:0.8 \
     -e MYSQL_USER=mysqluser \
     -e MYSQL_PASSWORD=mysqlpw
 
+On your host machine, check out a new branch for this module of the workshop and push it to your fork on GitHub:
+
+[source, sh]
+----
+# In microservices-lab
+git checkout -b module3 upstream/module3-start
+git push origin module3
+----
+
 Then build and start the application.
 Again we're using the source-to-image process for that:
 
 [source,sh]
 ----
-$ oc new-app --name=eventrapp debezium/msa-lab-s2i:latest~https://github.com/debezium/microservices-lab \
+$ oc new-app --name=eventrapp debezium/msa-lab-s2i:latest~https://github.com/<your fork>/microservices-lab#module3 \
     --context-dir=eventr \
     -e AB_PROMETHEUS_OFF=true \
     -e JAVA_OPTIONS=-Djava.net.preferIPv4Stack=true
@@ -610,15 +619,8 @@ As the topics are persistent, additional consumers can come up which have not be
 
 As an example, lets stream the `EvntrOrder` events to Elasticsearch now, too, making them available to the powerful fulltext search capabilities.
 
-TODO: must be run upfront on the host, should go into general set-up
-
-[source]
-----
-$ sudo sysctl -w vm.max_map_count=262144
-----
-
 Set up a single Elasticsearch node
-(it'd be a complete customer in production, but a single node is fine for the purposes of this lab)
+(it'd be a complete cluster in production, but a single node is fine for the purposes of this lab)
 and expose it as a service:
 
 [source]
@@ -720,12 +722,35 @@ There are different approaches for creating such aggregate events:
 
 In the following we're going to follow the second option.
 For that, a small extension to Hibernate ORM has been provided as part of the example application.
-By means of putting the `@MaterializeAggregate` to an aggregate root of the domain model,
+By means of putting the `@MaterializeAggregate` annotation to an aggregate root of the domain model,
 this entity and all its dependent types will be serialized as a JSON structure into the `aggregates` within the source database.
 We then can use Debezium to capture the changes of that table.
-A Kafka Connect SMT (single message transformation) is used to route the change events retrieved from that aggregate table into one topic per aggregate type.
+A https://github.com/debezium/microservices-lab/blob/master/json-expansion-smt/src/main/java/io/debezium/aggregation/smt/ExpandJsonSmt.java[Kafka Connect SMT] (single message transformation) is used to route the change events retrieved from that aggregate table into one topic per aggregate type.
 
-Let's begin by starting another build of Kafka Connect containing this SMT:
+Let's begin by adding the `@MaterializeAggregate` annotation to the `Order` entity.
+On your host machine, edit the file _eventr/src/main/java/io/debezium/examples/eventr/model/Order.java_:
+
+[source,java]
+----
+@MaterializeAggregate(aggregateName="orders_with_event")
+public class Order implements Serializable {
+    // ...
+}
+----
+
+Commit the change and push it to your GitHub fork:
+
+[source, sh]
+git commit -a -m "Materializing order aggregates"
+git push origin module3
+
+Then, in the VM running OpenShift, start another build of the "eventr" application.
+This will fetch your change, build the application and redeploy it:
+
+[source, sh]
+oc start-build eventr
+
+Next, start a build of Kafka Connect containing the SMT mentioned above:
 
 [source,sh]
 ----
