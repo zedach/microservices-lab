@@ -245,8 +245,8 @@ You can examine CDC messages in Kafka using the console consumer (use Ctrl + C t
 
 [source]
 ----
-$ oc exec -c kafka -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
-   --bootstrap-server localhost:9092 \
+$ oc exec -c zookeeper -it my-cluster-zookeeper-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
+   --bootstrap-server my-cluster-kafka-bootstrap:9092 \
    --from-beginning \
    --property print.key=true \
    --topic EventrOrder
@@ -800,8 +800,8 @@ After the connector has been deployed, create a few records in the example appli
 
 [source,sh]
 ----
-oc exec -c kafka -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
-   --bootstrap-server localhost:9092 \
+$ oc exec -c zookeeper -it my-cluster-zookeeper-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
+   --bootstrap-server my-cluster-kafka-bootstrap:9092 \
    --from-beginning \
    --property print.key=true \
    --topic orders_with_event
