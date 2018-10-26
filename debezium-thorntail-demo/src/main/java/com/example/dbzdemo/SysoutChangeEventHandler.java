@@ -28,7 +28,7 @@ import org.aerogear.kafka.cdi.annotation.KafkaConfig;
 @ApplicationScoped
 public class SysoutChangeEventHandler {
 
-    @Consumer(topics = "dbserver1.inventory.Hike", groupId = "sysout-handler")
+    @Consumer(topics = "#{ORDER_TOPIC_NAME}", groupId = "sysout-handler")
     public void receiver(String key, JsonObject value) {
         JsonValue payload = value.get( "payload" );
         String before = payload instanceof JsonObject ? ( (JsonObject)payload ).get( "before" ).toString() : "";
