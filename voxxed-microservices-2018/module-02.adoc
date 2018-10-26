@@ -90,7 +90,7 @@ which can be used for building and running Java applications on OpenShift.
 
 [source,sh]
 ----
-$ oc new-app --name=order-msa debezium/msa-lab-s2i:latest~https://github.com/debezium/microservices-lab \
+$ oc new-app --name=order-msa debezium/msa-lab-s2i:latest~https://github.com/<your fork>/microservices-lab#module2 \
     --context-dir=ticket-msa/order \
     -e MYSQL_DATABASE=inventory \
     -e AB_PROMETHEUS_OFF=true \
