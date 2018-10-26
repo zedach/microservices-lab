@@ -90,7 +90,7 @@ which can be used for building and running Java applications on OpenShift.
 
 [source,sh]
 ----
-$ oc new-app --name=order-msa debezium/msa-lab-s2i:latest~https://github.com/<your fork>/microservices-lab#module2 \
+$ oc new-app --name=order-msa debezium/msa-lab-s2i:latest~https://github.com/debezium/microservices-lab \
     --context-dir=ticket-msa/order \
     -e MYSQL_DATABASE=inventory \
     -e AB_PROMETHEUS_OFF=true \
@@ -150,11 +150,14 @@ exit
 
 At the same time, a corresponding message should have been produced to Kafka.
 Let's take a look at the topic using the console consumer coming with Kafka:
+(if you didn't scale down the cluster to a single node in module 1, please use `my-cluster-kafka-bootstrap:9092` as bootstrap server instead;
+it's a known limitation currently that the request can't be routed to the same node if there's just a single one,
+in which case `localhost` can be used as a workaround):
 
 [source,sh]
 ----
 $ oc exec -c kafka -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
-   --bootstrap-server my-cluster-kafka-bootstrap:9092 \
+   --bootstrap-server localhost:9092 \
    --from-beginning \
    --property print.key=true \
    --topic myorders

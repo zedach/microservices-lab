@@ -361,8 +361,6 @@ In order to do that, the related `my-cluster` resource needs to be updated using
 
 [source,sh]
 
-TODO: don't do this atm. Scaling to one node breaks the topic for module 2.
-
 $ oc edit kafka my-cluster
 
 It opens the default editor that we can use in order to change the value of the `kafka/replicas` field from 3 to 1.

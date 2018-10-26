@@ -246,11 +246,13 @@ You can examine CDC messages in Kafka using the console consumer (use Ctrl + C t
 [source]
 ----
 $ oc exec -c kafka -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
-   --bootstrap-server my-cluster-kafka-bootstrap:9092 \
+   --bootstrap-server localhost:9092 \
    --from-beginning \
    --property print.key=true \
    --topic EventrOrder
 ----
+
+Note: if you didn't scale down the cluster to a single node in module 1, please use `my-cluster-kafka-bootstrap:9092` as bootstrap server instead.
 
 Note that by default topic names follow the pattern "<db server name>.<db name>.<table name>".
 By means of the `RegexRouter` in the connector configuration we've changed that so that the topic name is just the unqualified table name.
@@ -799,11 +801,13 @@ After the connector has been deployed, create a few records in the example appli
 [source,sh]
 ----
 oc exec -c kafka -it my-cluster-kafka-0 -- /opt/kafka/bin/kafka-console-consumer.sh \
-   --bootstrap-server my-cluster-kafka-bootstrap:9092 \
+   --bootstrap-server localhost:9092 \
    --from-beginning \
    --property print.key=true \
    --topic orders_with_event
 ----
+
+Note: if you didn't scale down the cluster to a single node in module 1, please use `my-cluster-kafka-bootstrap:9092` as bootstrap server instead.
 
 Let's deploy another instance of the Elasticsearch sink connector for streaming the aggregate events into Elasticsearch:
 
