@@ -20,16 +20,12 @@ public class AdminResource {
 	@PersistenceContext(unitName="order-PU-JTA")
 	private EntityManager orderEm;
 
-	@PersistenceContext//(unitName="business")
-	private EntityManager businessEm;
-
 	public AdminResource() {
 	}
 
 	@GET
 	@Path("/populate")
 	public void populate() throws Exception {
-		clearDatabase(businessEm);
 		clearOrders(orderEm);
 
 

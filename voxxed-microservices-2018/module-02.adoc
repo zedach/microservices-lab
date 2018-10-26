@@ -106,13 +106,16 @@ Next we need to expose port 8080 for the service:
 
 [source,sh]
 $ oc patch service order-msa -p '{ "spec" : { "ports" : [{ "name" : "8080-tcp", "port" : 8080, "protocol" : "TCP", "targetPort" : 8080 }] } } }'
+service/order-msa patched
 $ oc expose svc order-msa
+route.route.openshift.io/order-msa exposed
 
 It's also a good idea to convert the application's build into an "incremental build",
 which will avoid refetching all dependencies from remote Maven repositories after the first build:
 
 [source,sh]
 $ oc patch bc/order-msa -p '{"spec":{"strategy":{"sourceStrategy":{"incremental":true}}}}'
+buildconfig.build.openshift.io/order-msa patched
 
 Use `oc get pods` to verify that the build has completed and the application is running:
 
@@ -140,7 +143,7 @@ After a while, the logs of the application itself should say that Thorntail has 
 
 [source,sh]
 ----
-oc logs $(oc get pods -o name -l app=order-msa)
+$ oc logs $(oc get pods -o name -l app=order-msa)
 ...
 2018-10-26 09:03:12,532 INFO  [org.jboss.as.server] (main) WFLYSRV0010: Deployed "order.war" (runtime-name : "order.war")
 2018-10-26 09:03:12,548 INFO  [org.wildfly.swarm] (main) THORN99999: Thorntail is Ready
