@@ -45,7 +45,7 @@ git checkout -b module3 upstream/module3-start
 git push origin module3
 ----
 
-Then build and start the application.
+Then, in the VM running OpenShift, build and start the application.
 Again we're using the source-to-image process for that:
 
 [source,sh]
@@ -98,7 +98,7 @@ The hostname of the exposed eventrapp service is available in the OpenShift cons
 [source]
 $ oc get routes eventrapp -o=jsonpath='{.spec.host}{"\n"}'
 
-Note the output, which should be in the format eventrapp-voxxed.<YOUR SERVER IP>.nip.io and you can navigate there using a browser.
+Note the output, which should be in the format eventrapp-voxxed.192.168.33.10.nip.io and you can navigate there using a browser.
 Alternatively, you could click on the application's URL within the OpenShift web UI.
 
 You can use "Populate Data" to create some example data (Click on "Search orders" after that to see the created entries).
@@ -127,11 +127,20 @@ $ oc process strimzi-connect-s2i \
 ----
 
 Use `oc status` to verify that the S2I process has finished
-(a deployment of `svc/debezium-connect` should be in state deployed):
+(a deployment of `svc/debezium-connect-api` should be in state "deployed"):
 
 [source]
 ----
 $ oc status
+In project voxxed on server https://127.0.0.1:8443
+
+svc/debezium-connect-api - 172.30.17.34:8083
+  dc/debezium-connect deploys istag/debezium-connect:latest <-
+    bc/debezium-connect source builds uploaded code on istag/debezium-connect-source:0.8.0
+      not built yet
+    deployment #2 deployed about a minute ago - 1 pod
+    deployment #1 failed 2 minutes ago: newer deployment was found running
+...
 ----
 
 Alternatively, you can check in the OpenShift web UI that the rolling deployment for "debezium-connect" has finished.
@@ -554,7 +563,8 @@ $ oc new-app \
     centos/postgresql-95-centos7
 ----
 
-Once the database has started (use `oc get pods` to verify that Postgres is running), register an instance of the Confluent JDBC sink connector:
+Once the database has started (use `oc get pods` to verify that Postgres is running), register an instance of the https://docs.confluent.io/current/connect/kafka-connect-jdbc/sink-connector/index.html[Kafka Connect JDBC sink connector].
+This connector can be used to propagate Kafka messages to relational databases via JDBC:
 
 [source]
 ----
@@ -603,7 +613,9 @@ psql -U postgresuser inventory -c 'select * from "EventrOrder"'
 
 As you alter records in the source web application,
 you'll see how the table in Postgres gets updated accordingly, if you re-execute the query.
-Note that `DELETE` operations currently cannot be propagated, as they are not yet supported by the Confluent JDBC sink connector.
+Note that `DELETE` operations currently cannot be propagated, as they are not yet supported by the JDBC sink connector.
+Debezium provides a solution for that by allowing deletes to be rewritten into updates of a logical "deleted" field in emitted messages.
+This can then be used to delete all records in the sink database e.g. using a batch job.
 
 To leave the shell on the Postgres pod, run:
 
@@ -701,9 +713,9 @@ Get its URL by executing:
 [source]
 $ oc get routes elasticsearch -o=jsonpath='{.spec.host}{"\n"}'
 
-Open that URL in a browser, it should be in the form http://elasticsearch-voxxed.<YOUR SERVER IP>.nip.io/.
+Open that URL in a browser, it should be in the form http://elasticsearch-voxxed.192.168.33.10.nip.io/.
 
-To browse the contents of the `eventrorder` index, go to http://elasticsearch-voxxed.<YOUR SERVER IP>.nip.io/eventrorder/_search?pretty.
+To browse the contents of the `eventrorder` index, go to http://elasticsearch-voxxed.192.168.33.10.nip.io/eventrorder/_search?pretty.
 Alternatively, you can use curl to do so:
 
 [source]
@@ -738,17 +750,19 @@ public class Order implements Serializable {
 }
 ----
 
+The file should look like https://github.com/debezium/microservices-lab/blob/master/eventr/src/main/java/io/debezium/examples/eventr/model/Order.java[this] eventually.
+
 Commit the change and push it to your GitHub fork:
 
 [source, sh]
 git commit -a -m "Materializing order aggregates"
 git push origin module3
 
-Then, in the VM running OpenShift, start another build of the "eventr" application.
+Then, in the VM running OpenShift, start another build of the "eventrapp" application.
 This will fetch your change, build the application and redeploy it:
 
 [source, sh]
-oc start-build eventr
+oc start-build eventrapp
 
 Next, start a build of Kafka Connect containing the SMT mentioned above:
 
@@ -809,7 +823,7 @@ Let's deploy another instance of the Elasticsearch sink connector for streaming 
 
 [source,sh]
 ----
-$ oc exec -c kafka -i my-cluster-kafka-0 -- curl -X POST -w "\n" \
+$ oc exec -c kafka -i my-cluster-kafka-0 -- curl -s -X POST -w "\n" \
     -H "Accept:application/json" \
     -H "Content-Type:application/json" \
     http://debezium-connect-api:8083/connectors -d @- <<'EOF'
@@ -832,7 +846,8 @@ $ oc exec -c kafka -i my-cluster-kafka-0 -- curl -X POST -w "\n" \
 EOF
 ----
 
-To browse the contents of the `orders_with_event` index, go to http://elasticsearch-voxxed.<YOUR SERVER IP>.nip.io/orders_with_event/_search?pretty.
+To browse the contents of the `orders_with_event` index, go to http://elasticsearch-voxxed.192.168.33.10.nip.io/orders_with_event/_search?pretty
+(adjust IP as needed).
 Alternatively, you can use curl to do so:
 
 [source]
