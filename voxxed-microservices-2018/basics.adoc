@@ -33,6 +33,7 @@ In order to obtain all the needed Maven dependencies before coming to the worksh
 mvn clean install -f eventr/pom.xml
 mvn clean install -f ticket-msa/invoice/pom.xml
 mvn clean install -f ticket-msa/order/pom.xml
+mvn clean install -f debezium-thorntail-demo/pom.xml
 
 === Provision Vagrant Box
 

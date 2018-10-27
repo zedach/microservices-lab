@@ -870,6 +870,57 @@ $ oc exec -i my-cluster-kafka-0 -- curl -s -X GET "elasticsearch:9200/orders_wit
 Having the complete aggregate within a single index allows for efficient queries based on all the properties of the aggregate,
 no matter in which table they are stored within the source database.
 
+==== Bonus: Programmatically Consuming Data Change Events
+
+If you still got some time left, let's explore how to programmatically consume the data change events produced by Debezium.
+I.e. not only Kafka Connect sink connectors can be used to consume the events, but you also can do quite easily using a custom Java application and the Kafka consumer API.
+
+As a starting point we've prepared another Thorntail application that consumes the events from the `EventrOrder` topic:
+
+[source,sh]
+----
+$ oc new-app --name=cdc-consumer-app fabric8/s2i-java:latest~https://github.com/<your fork>/microservices-lab.git#module3 \
+    --context-dir=debezium-thorntail-demo \
+    -e MYSQL_DATABASE=inventory \
+    -e AB_PROMETHEUS_OFF=true \
+    -e KAFKA_SERVICE_HOST=my-cluster-kafka-bootstrap \
+    -e KAFKA_SERVICE_PORT=9092 \
+    -e JAVA_OPTIONS=-Djava.net.preferIPv4Stack=true \
+    -e ORDER_TOPIC_NAME=EventrOrder
+
+# Make subsequent builds of the application executing faster
+$ oc patch bc/cdc-consumer-app -p '{"spec":{"strategy":{"sourceStrategy":{"incremental":true}}}}'
+
+# Expose port 8080
+$ oc patch service cdc-consumer-app -p '{ "spec" : { "ports" : [{ "name" : "8080-tcp", "port" : 8080, "protocol" : "TCP", "targetPort" : 8080 }] } } }'
+
+# Expose service
+$ oc expose svc cdc-consumer-app
+----
+
+There are two message consumers, _debezium-thorntail-demo/src/main/java/com/example/dbzdemo/SysoutChangeEventHandler.java_ and _debezium-thorntail-demo/src/main/java/com/example/dbzdemo/ws/WebSocketChangeEventHandler.java_.
+They are implemented using the Kafka CDI extension we've already seen in part two.
+The former simply prints out every message it receives.
+The latter propagates each received event to connect browsers via WebSockets.
+
+Once the application is running (use `oc get pods` to verify), you can observe how the two handlers react to the change events.
+For the former, check out the logs:
+
+[source,sh]
+----
+$ oc logs $(oc get pods -o name -l app=cdc-consumer-app)
+----
+
+For the latter, get the URL of the exposed service:
+[source]
+$ oc get routes cdc-consumer-app -o=jsonpath='{.spec.host}{"\n"}'
+
+Open that URL in a browser, it should be in the form http://cdc-consumer-app-voxxed.192.168.33.10.nip.io/.
+
+Modify some entries in the "eventr" application and observe how the change events are propagated to the other browser window via WebSockets in near-realtime.
+
+If you like, play a bit with the consumer application and adjust it to your requirements.
+
 ==== Environment cleanup
 
 After you complete all modules in this exercise then you can clean up the environment by issuing commands
