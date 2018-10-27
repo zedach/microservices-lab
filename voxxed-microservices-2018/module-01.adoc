@@ -30,10 +30,13 @@ You will do all this as part of the first lab.
 
 === Connecting to Your VM
 
+Make sure to have completed the set-up described in the <<basics#,basics>> chapter before continuing.
+
 First, connect via SSH to the Vagrant VM on your machine or your remote cloud environment.
 For a local Vagrant box run:
 
 [source, sh]
+$ cd microservices-lab/vm-setup
 $ vagrant up
 $ vagrant ssh
 
