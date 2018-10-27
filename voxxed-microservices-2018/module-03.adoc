@@ -879,7 +879,7 @@ As a starting point we've prepared another Thorntail application that consumes t
 
 [source,sh]
 ----
-$ oc new-app --name=cdc-consumer-app fabric8/s2i-java:latest~https://github.com/<your fork>/microservices-lab.git#module3 \
+$ oc new-app --name=cdc-consumer-app debezium/msa-lab-s2i:latest~https://github.com/<your fork>/microservices-lab.git#module3 \
     --context-dir=debezium-thorntail-demo \
     -e MYSQL_DATABASE=inventory \
     -e AB_PROMETHEUS_OFF=true \
