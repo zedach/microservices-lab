@@ -873,7 +873,12 @@ no matter in which table they are stored within the source database.
 ==== Bonus: Programmatically Consuming Data Change Events
 
 If you still got some time left, let's explore how to programmatically consume the data change events produced by Debezium.
-I.e. not only Kafka Connect sink connectors can be used to consume the events, but you also can do quite easily using a custom Java application and the Kafka consumer API.
+I.e. not only Kafka Connect sink connectors can be used to consume the events, but you also can do so quite easily using a custom Java application and the Kafka consumer API.
+
+As an example consider a microservice that needs (parts of) another service's data in order to perform its tasks.
+That second service could subscribe to the data changes of the first one one,
+apply some transformations, filtering etc. before persisting the first service's data in its own database.
+That way it will be able to perform its tasks, without performing any sorts of synchronous requests to the first microservice.
 
 As a starting point we've prepared another Thorntail application that consumes the events from the `EventrOrder` topic:
 
