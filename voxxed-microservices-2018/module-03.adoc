@@ -2,7 +2,7 @@
 :imagesdir: ./images
 
 This part of the lab introduces you to change data capture (CDC) using http://debezium.io/[Debezium].
-Debezium allows you to capture data changes from MySQL, Postgres, MongoDB, Oracle and SQL Server and stream those events into Apache Kafka.
+Debezium allows you to capture data changes from MySQL, PostgreSQL, MongoDB, Oracle and SQL Server and stream those events into Apache Kafka.
 It is based on https://kafka.apache.org/documentation/#connect[Kafka Connect].
 Streaming data changes from your database enables many interesting use cases such as
 
@@ -16,7 +16,7 @@ In this module of the lab you'll learn the following things:
 * Setting up Kafka Connect with the Debezium CDC connector for MySQL
 * Configuring an instance of that connector, ingesting changes from an existing example CRUD application
 * Different ways of processing change data events
-** Streaming data changes to a Postgres sink database
+** Streaming data changes to a PostgreSQL sink database
 ** Streaming data changes to an Elasticsearch index
 ** Streaming aggregate events to an Elasticsearch index
 
@@ -102,20 +102,22 @@ Now it's time to deploy Kafka Connect and Debezium.
 Kafka Connect is a platform for streaming data between Apache Kafka and other systems.
 It provides a framework and runtime environment for _source connectors_ (for getting data into Kafka)
 and _sink connectors_ (for getting data out of Kafka).
-Debezium provides a set of CDC source connectors for databases such as MySQL, Postgres and MongoDB.
+Debezium provides a set of CDC source connectors for databases such as MySQL, PostgreSQL and MongoDB.
 
 Let's begin by setting up a Kafka Connect cluster,
 using the S2I process provided by Strimzi.
-This makes it very easy to create a Kafka Connect cluster with additional connectors such as the ones provided by Debezium:
+This makes it very easy to create a Kafka Connect cluster with additional connectors such as the ones provided by Debezium (the operation must be executed as the `admin`):
 
 [source]
 ----
+$ oc login -u system:admin
 $ oc process strimzi-connect-s2i \
     -p CLUSTER_NAME=debezium \
     -p KAFKA_CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=1 \
     -p KAFKA_CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=1 \
     -p KAFKA_CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=1 \
     | oc apply -f -
+$ oc login -u developer
 ----
 
 Use `oc status` to verify that the S2I process has finished
@@ -140,7 +142,7 @@ Alternatively, you can check in the OpenShift web UI that the rolling deployment
 Then download the following files:
 
 * the Debezium CDC connector for MySQL
-* the Confluent JDBC sink connector and the Postgres database driver
+* the Confluent JDBC sink connector and the PostgreSQL database driver
 * the Confluent Elasticsearch sink connector and its dependencies
 
 Extract the downloaded files and trigger another S2I build of `debezium-connect`, this time including these additional resources:
@@ -550,12 +552,12 @@ In the following different ways for consuming events are explored.
 You can choose the one you are most interested in or walk through all the alternatives,
 as your preference.
 
-==== Streaming Data Changes to a Postgres Sink Database
+==== Streaming Data Changes to a PostgreSQL Sink Database
 
 To stream data changes into another database, no manual programming effort is needed.
 Instead, the Confluent JDBC sink connector for Kafka Connect can be used to data into a target database.
 
-So let's set up another database (Postgres in this case) and stream the data changes there.
+So let's set up another database (PostgreSQL in this case) and stream the data changes there.
 
 [source]
 ----
@@ -566,7 +568,7 @@ $ oc new-app \
     centos/postgresql-95-centos7
 ----
 
-Once the database has started (use `oc get pods` to verify that Postgres is running), register an instance of the https://docs.confluent.io/current/connect/kafka-connect-jdbc/sink-connector/index.html[Kafka Connect JDBC sink connector].
+Once the database has started (use `oc get pods` to verify that PostgreSQL is running), register an instance of the https://docs.confluent.io/current/connect/kafka-connect-jdbc/sink-connector/index.html[Kafka Connect JDBC sink connector].
 This connector can be used to propagate Kafka messages to relational databases via JDBC:
 
 [source]
@@ -599,8 +601,8 @@ As this sink connector just expects the effective state of changed rows
 (i.e. the "after" part from the Debezium data change messages),
 only this part is extracted using Debezium's `UnwrapFromEnvelope` SMT (single message transform).
 
-With the sink connector being set up, we can take a look into the Postgres database and see how the table changes are propgated there.
-Get a shell on the pod of the Postgres service:
+With the sink connector being set up, we can take a look into the PostgreSQL database and see how the table changes are propgated there.
+Get a shell on the pod of the PostgreSQL service:
 
 [source,sh]
 ----
@@ -615,12 +617,12 @@ psql -U postgresuser inventory -c 'select * from "EventrOrder"'
 ----
 
 As you alter records in the source web application,
-you'll see how the table in Postgres gets updated accordingly, if you re-execute the query.
+you'll see how the table in PostgreSQL gets updated accordingly, if you re-execute the query.
 Note that `DELETE` operations currently cannot be propagated, as they are not yet supported by the JDBC sink connector.
 Debezium provides a solution for that by allowing deletes to be rewritten into updates of a logical "deleted" field in emitted messages.
 This can then be used to delete all records in the sink database e.g. using a batch job.
 
-To leave the shell on the Postgres pod, run:
+To leave the shell on the PostgreSQL pod, run:
 
 [source]
 ----
@@ -928,7 +930,7 @@ In this part of the lab you've learned about the concept of change data capture 
 You've set up the Debezium connector for MySQL to ingest changes of an existing Java EE application,
 without requiring any code changes to that application.
 Then you've explored different ways for consuming the change events:
-using Kafka Connect and the JDBC sink adaptor to simply stream the data into a Postgres database
+using Kafka Connect and the JDBC sink adaptor to simply stream the data into a PostgreSQL database
 and using Thorntail and CDI to consume change events programmatically and relay them to a web browser using WebSockets.
 
 To learn more about Debezium, refer to its homepage http://debezium.io[http://debezium.io],

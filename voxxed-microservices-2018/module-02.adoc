@@ -215,8 +215,8 @@ Eventually, the file should look like https://github.com/debezium/microservices-
 Commit the change and push it to your GitHub fork:
 
 [source, sh]
-git commit -a -m "Implementing Kafka consumer"
-git push origin module2
+$ git commit -a -m "Implementing Kafka consumer"
+$ git push origin module2
 
 Switch to the console running OpenShift.
 The "invoice" app can be run similar to the one above, only the "--context-dir" is different:

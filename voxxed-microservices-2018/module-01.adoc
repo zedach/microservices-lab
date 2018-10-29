@@ -19,7 +19,7 @@ Strimzi simplifies these tasks by using a declarative approach to cluster and to
 A Kubernetes Operator is an application-specific controller that extends the Kubernetes API to create, configure, and manage instances of complex stateful applications on behalf of a Kubernetes user.
 It builds upon the basic Kubernetes resource and operator concepts but includes domain or application-specific knowledge to automate common tasks.
 
-Instead of relying on direct deployment and management of Zookeeper and Kafka clusters, Strimzi consists of a couple of these domain-specific operators that monitor the state of the cluster, making adjustments in accordance to a desired state read from dedicated configuration resources.
+Instead of relying on direct deployment and management of ZooKeeper and Kafka clusters, Strimzi consists of a couple of these domain-specific operators that monitor the state of the cluster, making adjustments in accordance to a desired state read from dedicated configuration resources.
 
 For creating an Apache Kafka cluster, for instance, you need to create a resource of type `kafka` that describes the properties of the cluster, and the *_cluster operator_* will deploy the cluster for you.
 If you need to change the state of the cluster, for example for changing properties or for adding new instances, all you have to do is to modify the resource and the changes will be rolled out accordingly.
@@ -287,14 +287,14 @@ strimzi-cluster-operator-7d8898b9b9-jfwv5     1/1       Running   0          14m
 In addition to the `cluster operator` created previously, notice a few more deployments:
 
 * the `entity operator` is now deployed as well - you can deploy it independently, but the Strimzi template deploys it out of the box; it is used to manage topics and/or users of Kafka
-* one Zookeeper node
+* one ZooKeeper node
 * three Kafka brokers
 
-Also, notice that the Zookeeper ensemble and the Kafka cluster are deployed as stateful sets.
+Also, notice that the ZooKeeper ensemble and the Kafka cluster are deployed as stateful sets.
 
 === Monitoring with Prometheus and Grafana
 
-By default, Strimzi provides the Kafka brokers and the Zookeeper nodes with a Prometheus JMX exporter agent which is running in order to export metrics.
+By default, Strimzi provides the Kafka brokers and the ZooKeeper nodes with a Prometheus JMX exporter agent which is running in order to export metrics.
 These metrics can be read and processed by a Prometheus server in order to monitoring the cluster.
 For building a graphical dashboard with such information, it's possible to use Grafana.
 
@@ -357,7 +357,7 @@ Note the output, which should be in the format `grafana-voxxed.<YOUR IP>.nip.io`
 Now we can set up the Prometheus data source and the Kafka dashboard.
 
 Access to the Grafana UI using `admin/admin` credentials
-(you'll be required to change the password after logging in).
+(you'll be ask to optionally change the password after logging in).
 
 image::grafana_login.png[grafana login]
 
