@@ -18,6 +18,9 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
+import io.debezium.examples.eventr.aggregation.hibernate.MaterializeAggregate;
+
+@MaterializeAggregate(aggregateName="orders_with_event")
 @Entity
 @Table(name = "EventrOrder")
 public class Order implements Serializable {

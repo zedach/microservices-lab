@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
+@MaterializeAggregate(aggregateName="orders_with_event")
 @Entity
 @Table(name = "MSA_ORDER")
 @XmlRootElement
