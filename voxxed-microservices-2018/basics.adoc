@@ -61,7 +61,19 @@ Verify you can run `sudo su - build`. After that, exit the box and shut it down:
 [source, sh]
 vagrant halt
 
-=== Alternative: Set-Up on Custom Cloud Box
+=== Alternative 1: Use Provided Cloud Boxes
+
+For those who couldn't set up the VM as described above, we've prepared a few cloud boxes with the environment.
+Please get in touch if you'd like to use one of those.
+Then run
+
+[source, sh]
+sudo ssh -L 8443:localhost:8443 -f -N build@<YOUR SERVER IP>
+ssh build@<YOUR SERVER IP>
+
+The port forwarding is needed due to an issue in the OpenShift web console which performs a redirect to localhost when starting it up.
+
+=== Alternative 2: Set-Up on Custom Cloud Box
 
 The environment can also be set up on a cloud box you can SSH into.
 You'll need to have Ansible 2.4 installed in this case on your local machine.
