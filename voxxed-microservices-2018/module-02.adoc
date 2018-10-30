@@ -105,16 +105,25 @@ If you couldn't apply the code changes yourself, you can also use the completed 
 Next we need to expose port 8080 for the service:
 
 [source,sh]
+----
 $ oc patch service order-msa -p '{ "spec" : { "ports" : [{ "name" : "8080-tcp", "port" : 8080, "protocol" : "TCP", "targetPort" : 8080 }] } } }'
+
 service/order-msa patched
+----
+
+[source,sh]
+----
 $ oc expose svc order-msa
+
 route.route.openshift.io/order-msa exposed
+----
 
 Use `oc get pods` to verify that the build has completed and the application is running:
 
 [source,sh]
 ----
 $ oc get pods
+
 NAME                                          READY     STATUS      RESTARTS   AGE
 order-msa-1-build                             0/1       Completed   0          58s
 order-msa-1-hwdp8                             1/1       Running     0          5s
@@ -126,6 +135,7 @@ You also can take a look at the logs of the build:
 [source,sh]
 ----
 $ oc logs order-msa-1-build
+
 ...
 Pushed 30/31 layers, 97% complete
 Pushed 31/31 layers, 100% complete
@@ -137,6 +147,7 @@ After a while, the logs of the application itself should say that Thorntail has 
 [source,sh]
 ----
 $ oc logs $(oc get pods -o name -l app=order-msa)
+
 ...
 2018-10-26 09:03:12,532 INFO  [org.jboss.as.server] (main) WFLYSRV0010: Deployed "order.war" (runtime-name : "order.war")
 2018-10-26 09:03:12,548 INFO  [org.wildfly.swarm] (main) THORN99999: Thorntail is Ready

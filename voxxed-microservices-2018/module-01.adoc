@@ -189,11 +189,14 @@ Next, install the Strimzi templates.
 The Cluster Operator related templates contain predefined resources for easily deploying clusters (for Kafka Connect as well).
 
 [source, sh]
+----
 $ oc apply -f examples/templates/cluster-operator -n voxxed
+
 template.template.openshift.io "strimzi-connect-s2i" created
 template.template.openshift.io "strimzi-connect" created
 template.template.openshift.io "strimzi-ephemeral" created
 template.template.openshift.io "strimzi-persistent" created
+----
 
 Now you can deploy a Kafka cluster.
 For this lab, we will use a template (so to bootstrap only a single ZooKeeper node),
@@ -207,6 +210,7 @@ This is done via `oc patch` the newly set up cluster resource.
 Here are the two commands:
 
 [source, sh]
+----
 $ oc process strimzi-persistent \
     -p ZOOKEEPER_NODE_COUNT=1 \
     -p KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
@@ -215,11 +219,14 @@ $ oc process strimzi-persistent \
     oc patch kafka my-cluster --type merge -p '{ "spec" : { "zookeeper" : { "resources" : { "limits" : { "memory" : "512Mi" }, "requests" : { "memory" : "512Mi" } } },  "kafka" : { "resources" : { "limits" : { "memory" : "1Gi" }, "requests" : { "memory" : "1Gi" } } } } }'
 
 kafka "my-cluster" created
+----
 
 Let's take a look at the resource we've created:
 
 [source, sh]
+----
 $ oc describe kafka my-cluster
+
 Name:         my-cluster
 Namespace:    voxxed
 Labels:       <none>
@@ -264,6 +271,7 @@ Spec:
     Storage:
       Type:  ephemeral
 Events:      <none>
+----
 
 Note how for instance the number of Kafka and ZooKeeper nodes is controlled using the `Replicas` parameters.
 
@@ -275,7 +283,9 @@ $ oc get pods -w
 Wait until all pods have spun up and are in `Running` status:
 
 [source,sh]
+----
 $ oc get pods -w
+
 NAME                                          READY     STATUS    RESTARTS   AGE
 my-cluster-entity-operator-8669d89df6-g975b   3/3       Running   0          3m
 my-cluster-kafka-0                            2/2       Running   0          4m
@@ -283,6 +293,7 @@ my-cluster-kafka-1                            2/2       Running   0          4m
 my-cluster-kafka-2                            2/2       Running   0          4m
 my-cluster-zookeeper-0                        2/2       Running   0          4m
 strimzi-cluster-operator-7d8898b9b9-jfwv5     1/1       Running   0          14m
+----
 
 In addition to the `cluster operator` created previously, notice a few more deployments:
 
@@ -404,12 +415,15 @@ After saving the file, the Cluster Operator detects the update and removes two b
 You can see this by visualizing the pods again:
 
 [source,sh]
+----
 $ oc get pods
+
 NAME                                          READY     STATUS    RESTARTS   AGE
 my-cluster-entity-operator-549b687c88-gb4w9   3/3       Running   0          45m
 my-cluster-kafka-0                            2/2       Running   0          46m
 my-cluster-zookeeper-0                        2/2       Running   0          38s
 strimzi-cluster-operator-5bbcc486fc-hwswp     1/1       Running   0          47m
+----
 
 Notice the pods `my-cluster-kafka-1` and `my-cluster-kafka-2` are first in state "Terminating" and should then disappear after a while.
 For the rest of the lab, we recommend keep the size to one node.
@@ -419,20 +433,28 @@ For the rest of the lab, we recommend keep the size to one node.
 It's possible to create a topic by creating a `kafkatopic` resource from scratch, but for this lab we are going to use the related example resource file:
 
 [source,sh]
+----
 $ oc apply -f examples/topic/kafka-topic.yaml
+
 kafkatopic "my-topic" created
+----
 
 In order to check that the Topic Operator has detected the new resource and created a related topic in the Kafka cluster, we can run the official `kafka-topics.sh` tool on one of the brokers.
 
 [source,sh]
+----
 $ oc exec -it my-cluster-kafka-0 -c kafka -- bin/kafka-topics.sh --zookeeper localhost:2181 --describe
+
 Topic:my-topic	PartitionCount:1	ReplicationFactor:1	Configs:segment.bytes=1073741824,retention.ms=7200000
 	Topic: my-topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+----
 
 You also can examine the topic resource itself using `oc describe`:
 
 [source,sh]
+----
 $ oc describe kafkatopic my-topic
+
 Name:         my-topic
 Namespace:    voxxed
 Labels:       strimzi.io/cluster=my-cluster
@@ -452,6 +474,7 @@ Spec:
   Partitions:         1
   Replicas:           1
 Events:               <none>
+----
 
 [NOTE]
 ====
@@ -468,31 +491,42 @@ $ oc delete $(oc get pods -o name -l strimzi.io/name=my-cluster-entity-operator)
 Let's increase the partitions number now:
 
 [source,sh]
+----
 $ oc edit kafkatopic my-topic
+----
 
 Set the value of `spec/partitions` to `3`.
 
 Alternatively, you could also edit the file _examples/topic/kafka-topic.yaml_ (e.g. using _vi_) and apply it again;
 
 [source,sh]
+----
 $ oc apply -f examples/topic/kafka-topic.yaml
+
 kafkatopic "my-topic" configured
+----
 
 The Topic Operator updates the related Kafka topic accordingly.
 We can check that describing the topic one more time.
 
 [source,sh]
+----
 $ oc exec -it my-cluster-kafka-0 -c kafka -- bin/kafka-topics.sh --zookeeper localhost:2181 --describe
+
 Topic:my-topic	PartitionCount:3	ReplicationFactor:1	Configs:segment.bytes=1073741824,retention.ms=7200000
 	Topic: my-topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
 	Topic: my-topic	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
 	Topic: my-topic	Partition: 2	Leader: 0	Replicas: 0	Isr: 0
+----
 
 Finally, a topic can be deleted like so:
 
 [source,sh]
+----
 $ oc delete kafkatopic my-topic
+
 kafkatopic "my-topic" deleted
+----
 
 The Topic Operator detects the deletion of the resource and deletes the related Kafka topic from the cluster.
 We can check that listing the available topics.

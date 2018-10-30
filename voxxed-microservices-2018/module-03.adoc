@@ -79,11 +79,13 @@ Once the build has completed, you should see the following status
 (the build job must be "Completed", the actual application and the database "Running"):
 
 [source,sh]
+----
 NAME                                          READY     STATUS    RESTARTS   AGE
 eventrapp-1-build                             0/1       Completed   0          2m
 eventrapp-1-m4rss                             1/1       Running     0          39s
 mysql-2-gk8nw                                 1/1       Running     0          2m
 ...
+----
 
 The hostname of the exposed eventrapp service is available in the OpenShift console, or can be retrieved via CLI:
 
@@ -126,6 +128,7 @@ Use `oc status` to verify that the S2I process has finished
 [source]
 ----
 $ oc status
+
 In project voxxed on server https://127.0.0.1:8443
 
 svc/debezium-connect-api - 172.30.17.34:8083
