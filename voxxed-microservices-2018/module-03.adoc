@@ -22,7 +22,7 @@ In this module of the lab you'll learn the following things:
 
 The overall architecture of this lab module looks like this:
 
-image::debezium-demo.png[debezium-demo]
+image::debezium-demo.png[Module 3 Architecture Overview]
 
 === Setting Up the Example Application
 
@@ -749,6 +749,10 @@ this entity and all its dependent types will be serialized as a JSON structure i
 We then can use Debezium to capture the changes of that table.
 A https://github.com/debezium/microservices-lab/blob/master/json-expansion-smt/src/main/java/io/debezium/aggregation/smt/ExpandJsonSmt.java[Kafka Connect SMT] (single message transformation) is used to route the change events retrieved from that aggregate table into one topic per aggregate type.
 
+The following shows an overview of this approach:
+
+image::local_view_materialization.png[Local View Materalization]
+
 Let's begin by adding the `@MaterializeAggregate` annotation to the `Order` entity.
 On your host machine, edit the file _eventr/src/main/java/io/debezium/examples/eventr/model/Order.java_:
 
@@ -817,7 +821,8 @@ $ oc exec -c kafka -i my-cluster-kafka-0 -- curl -s -X POST -w "\n" \
 EOF
 ----
 
-This captures only changes to the `aggregates` table and applies the `ExpandJsonSmt` SMT for routing the events to the correct topic.
+This captures only changes to the `aggregates` table and applies the `ExpandJsonSmt` SMT for routing the events to the correct topic
+(each entry from the `aggregates` table will be routed into a Kafka topic with the name configured via the `@MaterializeAggregate` annotations).
 After the connector has been deployed, create a few records in the example application and observe the corresponding aggregate events in the Kafka topic:
 
 [source,sh]
