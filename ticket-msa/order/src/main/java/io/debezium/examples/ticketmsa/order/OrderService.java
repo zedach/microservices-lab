@@ -1,5 +1,8 @@
 package io.debezium.examples.ticketmsa.order;
 
+import io.debezium.examples.ticketmsa.order.model.Order;
+import org.aerogear.kafka.cdi.annotation.KafkaConfig;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -9,10 +12,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import io.debezium.examples.ticketmsa.order.model.Order;
-
 @Path("/orders")
 @ApplicationScoped
+@KafkaConfig(bootstrapServers = "#{KAFKA_SERVICE_HOST}:#{KAFKA_SERVICE_PORT}")
 public class OrderService {
 
     @PersistenceContext
