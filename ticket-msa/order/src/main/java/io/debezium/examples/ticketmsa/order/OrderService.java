@@ -2,8 +2,10 @@ package io.debezium.examples.ticketmsa.order;
 
 import io.debezium.examples.ticketmsa.order.model.Order;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -28,4 +30,8 @@ public class OrderService {
         order = entityManager.merge(order);
         return order;
     }
+
+    @Inject
+    @ConfigProperty(name="order.topic.name", defaultValue="orders")
+    private String topicName;
 }
