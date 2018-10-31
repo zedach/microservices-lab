@@ -25,19 +25,20 @@ public class OrderService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @POST
-    @Transactional
-    @Produces("application/json")
-    @Consumes("application/json")
-    public Order addOrder(Order order) {
-        order = entityManager.merge(order);
-        return order;
-    }
-
     @Inject
     @ConfigProperty(name="order.topic.name", defaultValue="orders")
     private String topicName;
 
     @Producer
     private SimpleKafkaProducer<Integer, JsonObject> kafka;
+
+    @POST
+    @Transactional
+    @Produces("application/json")
+    @Consumes("application/json")
+    public Order addOrder(Order order) {
+        order = entityManager.merge(order);
+        kafka.send(topicName, order.getId(), order.toJson());
+        return order;
+    }
 }
