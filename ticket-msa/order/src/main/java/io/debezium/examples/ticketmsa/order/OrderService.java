@@ -1,11 +1,14 @@
 package io.debezium.examples.ticketmsa.order;
 
 import io.debezium.examples.ticketmsa.order.model.Order;
+import org.aerogear.kafka.SimpleKafkaProducer;
 import org.aerogear.kafka.cdi.annotation.KafkaConfig;
+import org.aerogear.kafka.cdi.annotation.Producer;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -34,4 +37,7 @@ public class OrderService {
     @Inject
     @ConfigProperty(name="order.topic.name", defaultValue="orders")
     private String topicName;
+
+    @Producer
+    private SimpleKafkaProducer<Integer, JsonObject> kafka;
 }
